@@ -1,5 +1,3 @@
-@import "./skin/_default.scss";
-
 //variables
 $indent: 1rem;
 
@@ -28,9 +26,9 @@ $indent: 1rem;
 }
 
 .dt-node__body{
-	display: block;
+	display: none;
 }
 
-.dt-node__body--collapsed{
-	display: none;
+.dt-node__body--open{
+	display: block;
 }

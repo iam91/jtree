@@ -1,7 +1,8 @@
 {
   "devDependencies": {
-    "gulp-minify-css": "^1.2.4",
+    "gulp-clean-css": "^2.3.2",
     "gulp-sass": "^2.3.2",
-    "node-sass": "^3.11.2"
+    "node-sass": "^3.11.2",
+    "gulp-svgmin": "^1.2.3"
   }
 }

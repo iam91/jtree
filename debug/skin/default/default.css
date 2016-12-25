@@ -14,26 +14,5 @@
   display: inline-block;
   transform: rotate(90deg); }
 
-.dt-node__icon--collapsed {
+.dt-node__icon--open {
   transform: rotate(0deg); }
-
-.dt-node:before {
-  content: "";
-  display: inline-block;
-  width: 1rem; }
-
-.dt-node__wrap {
-  display: inline-block; }
-
-.dt-node__head {
-  cursor: default;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none; }
-
-.dt-node__body {
-  display: block; }
-
-.dt-node__body--collapsed {
-  display: none; }
