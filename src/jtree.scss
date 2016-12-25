@@ -1,0 +1,36 @@
+@import "./skin/_default.scss";
+
+//variables
+$indent: 1rem;
+
+//mixins
+@mixin user-select-none{
+	-webkit-user-select: none;
+	   -moz-user-select: none;
+	    -ms-user-select: none;
+	        user-select: none;
+}
+
+//structure
+.dt-node:before{
+	content: "";
+	display: inline-block;
+	width: $indent;
+}
+
+.dt-node__wrap{
+	display: inline-block;
+}
+
+.dt-node__head{
+	cursor: default;
+	@include user-select-none;
+}
+
+.dt-node__body{
+	display: block;
+}
+
+.dt-node__body--collapsed{
+	display: none;
+}

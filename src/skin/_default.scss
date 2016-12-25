@@ -1,0 +1,31 @@
+//variables
+$icon-size: 0.8rem;
+$icon-width: $icon-size - 0.08rem;
+$icon-length: $icon-size;
+$icon-color: black;
+
+$collapse-dur: 0.1s;
+
+//mixin
+@mixin arrow($color){
+	border-top: $icon-width / 2 solid transparent;
+	border-bottom: $icon-width / 2 solid transparent;
+	border-left: $icon-length solid $color;
+	margin: 0 ($icon-size - $icon-width) / 2;
+	display: inline-block;
+}
+
+.dt-node__icon--folder{
+	@include arrow($icon-color);
+	transform: rotate(90deg);
+	//transition: transform $collapse-dur linear;
+}
+
+.dt-node__icon--file{
+	@include arrow(white);
+	transform: rotate(90deg);
+}
+
+.dt-node__icon--collapsed{
+	transform: rotate(0deg);
+}

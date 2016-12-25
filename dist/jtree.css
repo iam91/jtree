@@ -1,0 +1,39 @@
+.dt-node__icon--folder {
+  border-top: 0.36rem solid transparent;
+  border-bottom: 0.36rem solid transparent;
+  border-left: 0.8rem solid black;
+  margin: 0 0.04rem;
+  display: inline-block;
+  transform: rotate(90deg); }
+
+.dt-node__icon--file {
+  border-top: 0.36rem solid transparent;
+  border-bottom: 0.36rem solid transparent;
+  border-left: 0.8rem solid white;
+  margin: 0 0.04rem;
+  display: inline-block;
+  transform: rotate(90deg); }
+
+.dt-node__icon--collapsed {
+  transform: rotate(0deg); }
+
+.dt-node:before {
+  content: "";
+  display: inline-block;
+  width: 1rem; }
+
+.dt-node__wrap {
+  display: inline-block; }
+
+.dt-node__head {
+  cursor: default;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none; }
+
+.dt-node__body {
+  display: block; }
+
+.dt-node__body--collapsed {
+  display: none; }
