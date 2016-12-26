@@ -85,6 +85,59 @@
     	}
     }
 
+    /**
+     * Mime
+     * @namespace
+     */
+     var Mime = {
+         map: {
+             'text': {
+                 'html': 'html',
+                 'css' : 'css',
+                 'plain': 'txt'
+             },
+
+             'application': {
+                 'js': 'js',
+                 'pdf': 'pdf',
+                 'vnd.ms-powerpoint': 'ppt',
+                 'msword': 'word',
+                 'vnd.ms-excel': 'xls',
+                 'zip': 'zip'
+             },
+
+             'image': 'pic',
+             'video': 'video',
+             'audio': 'audio'
+         },
+
+         getFormat: function(mime){
+             var m = mime.split('/');
+             var type = m[0];
+             var subtype = m[1];
+             var r = this.map[type];
+             if(r){
+                 return typeof r === 'string' ? r : r[subtype];
+             }else{
+                 return null;
+             }
+         }
+     };
+
+     var mimeclass = {};
+     for(var type in Mime.map){
+         var val = Mime.map[type];
+         if(typeof val === 'string'){
+             mimeclass[val] = 'dt-node__icon--' + val;
+         }else{
+             for(var subtype in val){
+                 var subval = val[subtype];
+                 mimeclass[subval] = 'dt-node__icon--' + subval;
+             }
+         }
+     }
+
+     Mime.classname = mimeclass;
 
     /**
      * View
@@ -98,7 +151,6 @@
             NODE_HEAD           : 'dt-node__head',
             NODE_BODY           : 'dt-node__body',
             NODE_BODY_OPEN      : 'dt-node__body--open',
-            NODE_ICON_FILE      : 'dt-node__icon--file',
             NODE_ICON_FOLDER    : 'dt-node__icon--folder',
             NODE_ICON_OPEN      : 'dt-node__icon--open',
             NODE_TITLE          : 'dt-node__title',
@@ -229,8 +281,15 @@
              var data = this._data;
 
     		 var ic = View.getIcon(this._el);
-    		 ic.classList.add(data.type == NODE_TYPE.FOLDER ?
-    			 CLASS_NAME.NODE_ICON_FOLDER : CLASS_NAME.NODE_ICON_FILE);
+
+            if(data.type == NODE_TYPE.FILE){
+                var format = Mime.getFormat(data.mime);
+                ic.classList.add(Mime.classname[format]);
+            }else if(data.type === NODE_TYPE.FOLDER){
+                ic.classList.add(CLASS_NAME.NODE_ICON_FOLDER);
+            }
+
+             //todo add mime
 
 
              if(typeof data.children === 'string'){

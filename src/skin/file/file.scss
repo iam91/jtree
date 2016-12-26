@@ -1,8 +1,8 @@
 /**
  * Tree styles
  */
-$icon-size: 16px;
-$font-size: 12px;
+$icon-size: 20px;
+$font-size: 14px;
 $font-color: #59606d;
 $font-active-color: #282f44;
 $font-stack: "Helvetica Neue",
@@ -12,6 +12,13 @@ $font-stack: "Helvetica Neue",
 			 'simhei',
 			 Arial,
 			 sans-serif;
+
+$mime-icon:
+	'js' 'css' 'html'
+	'pic' 'video' 'audio'
+	'ppt' 'xls' 'word'
+	'txt' 'pdf' 'zip'
+	'unknown';
 
 .dt-node__wrap{
 	color: $font-color;
@@ -47,16 +54,18 @@ $font-stack: "Helvetica Neue",
 	vertical-align: text-bottom;
 }
 
-.dt-node__icon--folder{
-	background-image: url('./folder-close.svg');
+@each $icon in $mime-icon{
+	.dt-node__icon--#{$icon}{
+		background-image: url(#{'./icons/' + $icon + '.svg'});
+	}
 }
 
-.dt-node__icon--file{
-	background-image: url('./file.svg');
+.dt-node__icon--folder{
+	background-image: url('./icons/folder-close.svg');
 }
 
 .dt-node__icon--open{
-	background-image: url('./folder-open.svg');
+	background-image: url('./icons/folder-open.svg');
 }
 
 /**
