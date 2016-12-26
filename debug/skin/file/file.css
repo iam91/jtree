@@ -1,3 +1,6 @@
+/**
+ * Tree styles
+ */
 .dt-node__wrap {
   color: #59606d;
   font-size: 12px;
@@ -12,6 +15,11 @@
     text-decoration: underline; }
   .dt-node__title:active {
     color: #282f44; }
+
+.dt-node__title[contenteditable="true"] {
+  padding: 1px 3px;
+  outline: #59606d solid 1px;
+  text-decoration: none; }
 
 [class^="dt-node__icon"] {
   width: 16px;
@@ -28,3 +36,18 @@
 
 .dt-node__icon--open {
   background-image: url("./folder-open.svg"); }
+
+/**
+ * Menu styles
+ */
+.dt-menu {
+  background-color: white; }
+  .dt-menu ul {
+    box-shadow: 1px 1px 2px #395ea6; }
+  .dt-menu li:hover {
+    color: white;
+    background-color: #2ea1d9; }
+    .dt-menu li:hover ul {
+      color: #59606d; }
+  .dt-menu li:active {
+    background-color: #395ea6; }

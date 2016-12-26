@@ -158,7 +158,16 @@
         },
 
         getTitle: function(el){
-            return el.firstChild.firstChild.lastChild;
+            return el.firstChild.firstChild.firstChild.nextElementSibling;
+        },
+
+        appendMenu: function(el, menu){
+            var head = this.getHead(el);
+            head.appendChild(menu);
+        },
+
+        menuParent: function(menu){
+            return menu.parentNode.parentNode.parentNode;
         }
 
     };
@@ -322,9 +331,11 @@
 
         delete: function(){
             var parent = this._parent;
-            var id = parent.removeChild(this);
-    		//handle model
-    		this._data.splice(id, 1);
+            if(parent){
+                var id = parent.removeChild(this);
+        		//handle model
+        		this._data.splice(id, 1);
+            }
         },
 
         create: function(){
@@ -361,7 +372,7 @@
     	 * @param {TreeNode} node
     	 */
     	paste: function(node){
-    		if(this._data.type == NODE_TYPE.FOLDER){
+    		if(node && this._data.type == NODE_TYPE.FOLDER){
     			this.appendChild(node);
     			this.expand();
     			//handle model
@@ -497,8 +508,7 @@
          },
 
          _showMenu: function(el){
-             var head = View.getHead(el);
-             head.appendChild(this._elMenu);
+             View.appendMenu(el, this._elMenu);
              this._menuShowing = true;
          },
 
@@ -540,10 +550,12 @@
              var target = e.target;
              var command = target.name;
 
-             var currNodeEl = this._elMenu.parentNode;
+             var currNodeEl = View.menuParent(this._elMenu);
              var currNode = this._tokenPool.get(currNodeEl.dataset.dtToken);
-             var r = currNode[command](this._clipBoard);
-             this._clipBoard = r || this._clipBoard;
+             if(command){
+                 var r = currNode[command](this._clipBoard);
+                 this._clipBoard = r || this._clipBoard;
+             }
          },
 
          _enableEdit: function(e){

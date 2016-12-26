@@ -2,6 +2,8 @@
 $indent: 14px;
 $zindex-max: 99999;
 
+$menu-height: 20px;
+
 //mixins
 @mixin user-select-none{
 	-webkit-user-select: none;
@@ -38,8 +40,35 @@ $zindex-max: 99999;
 .dt-menu{
 	position: absolute;
 	z-index: $zindex-max;
+	left: 100%;
+
 	ul{
+		padding: 0;
+		margin: 0;
 		list-style-type: none;
 	}
 
+	a{
+		line-height: $menu-height;
+	}
+
+	li{
+		padding: 0 1rem;
+		text-align: center;
+	}
+
+	&>ul>li:last-of-type{
+		position: relative;
+
+		ul{
+			display: none;
+		}
+
+		&:hover ul{
+			display: block !important;
+			position: absolute !important;
+			left: 100% !important;
+			top: 0 !important;
+		}
+	}
 }

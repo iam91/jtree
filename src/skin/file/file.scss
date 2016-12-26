@@ -1,3 +1,6 @@
+/**
+ * Tree styles
+ */
 $icon-size: 16px;
 $font-size: 12px;
 $font-color: #59606d;
@@ -30,6 +33,12 @@ $font-stack: "Helvetica Neue",
 	}
 }
 
+.dt-node__title[contenteditable="true"]{
+	padding: 1px 3px;
+	outline: $font-color solid 1px;
+	text-decoration: none;
+}
+
 [class^="dt-node__icon"]{
 	width: $icon-size;
 	height: $icon-size;
@@ -48,4 +57,32 @@ $font-stack: "Helvetica Neue",
 
 .dt-node__icon--open{
 	background-image: url('./folder-open.svg');
+}
+
+/**
+ * Menu styles
+ */
+$menu-hover-color: #2ea1d9;
+$menu-active-color: #395ea6;
+$menu-shadow-color: #395ea6;
+
+.dt-menu{
+	background-color: white;
+
+	ul{
+		box-shadow: 1px 1px 2px $menu-shadow-color;
+	}
+
+	li{
+		&:hover{
+			color: white;
+			background-color: $menu-hover-color;
+			ul{
+				color: $font-color;
+			}
+		}
+		&:active{
+			background-color: $menu-active-color;
+		}
+	}
 }
