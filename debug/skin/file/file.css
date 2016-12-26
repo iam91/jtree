@@ -83,7 +83,20 @@
 .dt-menu {
   margin: 0.5rem;
   left: 50%;
-  background-color: white; }
+  background-color: white;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 2px;
+  transition: box-shadow 0.1s linear; }
+  .dt-menu:hover {
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15); }
+  .dt-menu ul ul {
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 2px;
+    transition: box-shadow 0.1s linear; }
+    .dt-menu ul ul:hover {
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15); }
+  .dt-menu > div {
+    padding: 0.5rem 0; }
   .dt-menu::before {
     content: "";
     left: 5px;
@@ -91,19 +104,13 @@
     top: -18px;
     border: 9px solid transparent;
     border-bottom-color: rgba(0, 0, 0, 0.15); }
-  .dt-menu > ul::before {
+  .dt-menu > div::before {
     content: "";
-    left: 5px;
+    left: 6px;
     position: absolute;
     top: -16px;
     border: 8px solid transparent;
     border-bottom-color: white; }
-  .dt-menu ul {
-    border: 1px solid rgba(0, 0, 0, 0.15);
-    border-radius: 2px;
-    transition: box-shadow 0.1s linear; }
-    .dt-menu ul:hover {
-      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15); }
   .dt-menu li:hover {
     color: white;
     background-color: #2ea1d9; }

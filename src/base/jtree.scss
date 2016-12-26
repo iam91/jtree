@@ -57,7 +57,7 @@ $menu-height: 20px;
 		text-align: center;
 	}
 
-	&>ul>li:nth-last-child(-n+2){
+	&>div>ul>li:nth-last-child(-n+2){
 		position: relative;
 
 		ul{

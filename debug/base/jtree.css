@@ -33,11 +33,11 @@
   .dt-menu li {
     padding: 3px 1rem;
     text-align: center; }
-  .dt-menu > ul > li:nth-last-child(-n+2) {
+  .dt-menu > div > ul > li:nth-last-child(-n+2) {
     position: relative; }
-    .dt-menu > ul > li:nth-last-child(-n+2) ul {
+    .dt-menu > div > ul > li:nth-last-child(-n+2) ul {
       display: none; }
-    .dt-menu > ul > li:nth-last-child(-n+2):hover ul {
+    .dt-menu > div > ul > li:nth-last-child(-n+2):hover ul {
       display: block !important;
       position: absolute !important;
       left: 100% !important;

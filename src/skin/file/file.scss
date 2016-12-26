@@ -78,45 +78,57 @@ $mime-icon:
 /**
  * Menu styles
  */
+$arrow-size: 9px;
+$menu-border-width: 1px;
+$menu-border-color: rgba(0,0,0,0.15);
+
 $menu-bg-color: white;
-$menu-border: 1px solid rgba(0,0,0,0.15);
+$menu-border: $menu-border-width solid $menu-border-color;
 $menu-hover-color: #2ea1d9;
 $menu-active-color: #395ea6;
 $menu-shadow: 0 3px 12px rgba(0,0,0,0.15);
 
 $search-line-height: 20px;
 
-@mixin arrow($size, $border-color){
-	position: absolute;
-	top: -$size * 2;
-	border: $size solid transparent;
-	border-bottom-color: $border-color;
+@mixin menu-border(){
+	border: $menu-border;
+	border-radius: 2px;
+	transition: box-shadow 0.1s linear;
+	&:hover{
+		box-shadow: $menu-shadow;
+	}
 }
 
 .dt-menu{
 	margin: 0.5rem;
 	left: 50%;
 	background-color: $menu-bg-color;
+	@include menu-border();
+
+	ul ul{
+		@include menu-border();
+	}
+
+	&>div{
+		padding: 0.5rem 0;
+	}
 
 	&::before{
 		content: "";
 		left: 5px;
-		@include arrow(9px, rgba(0,0,0,0.15));
+		position: absolute;
+		top: -$arrow-size * 2;
+		border: $arrow-size solid transparent;
+		border-bottom-color: $menu-border-color;
 	}
 
-	&>ul::before{
+	&>div::before{
 		content: "";
-		left: 5px;
-		@include arrow(8px, $menu-bg-color);
-	}
-
-	ul{
-		border: $menu-border;
-		border-radius: 2px;
-		transition: box-shadow 0.1s linear;
-		&:hover{
-			box-shadow: $menu-shadow;
-		}
+		left: 5px + $menu-border-width;
+		position: absolute;
+		top: -($arrow-size - $menu-border-width) * 2;
+		border: $arrow-size - $menu-border-width solid transparent;
+		border-bottom-color: $menu-bg-color;
 	}
 
 	li{

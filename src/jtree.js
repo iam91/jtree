@@ -162,7 +162,7 @@
 
         MENU : {
             TPL:
-            '<ul class="dt-menu">' +
+            '<div><ul>' +
         		'<li><a name="create">create</a></li>' +
         		'<li><a name="delete">delete</a></li>' +
         		'<li><a name="rename">rename</a></li>' +
@@ -180,7 +180,7 @@
         				'<li><a name="paste">paste</a></li>' +
         			'</ul>' +
         		'</li>' +
-            '</ul>',
+            '</ul></div>',
         },
 
         TPL:
