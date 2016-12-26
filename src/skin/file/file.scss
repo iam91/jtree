@@ -13,6 +13,8 @@ $font-stack: "Helvetica Neue",
 			 Arial,
 			 sans-serif;
 
+$found-color: #fa4659;
+
 $mime-icon:
 	'js' 'css' 'html'
 	'pic' 'video' 'audio'
@@ -38,6 +40,11 @@ $mime-icon:
 	&:active{
 		color: $font-active-color;
 	}
+}
+
+.dt-node__title--found{
+	color: $found-color;
+	text-shadow: 1px 1px 1px $found-color;
 }
 
 .dt-node__title[contenteditable="true"]{
@@ -75,23 +82,36 @@ $menu-hover-color: #2ea1d9;
 $menu-active-color: #395ea6;
 $menu-shadow-color: #395ea6;
 
+$search-line-height: 20px;
+
 .dt-menu{
 	background-color: white;
 
 	ul{
-		box-shadow: 1px 1px 2px $menu-shadow-color;
+		border-radius: 1px;
+		box-shadow: 1px 1px 3px $menu-shadow-color;
 	}
 
 	li{
 		&:hover{
 			color: white;
 			background-color: $menu-hover-color;
+			box-shadow: 0 0 1px $menu-hover-color;
 			ul{
 				color: $font-color;
 			}
 		}
 		&:active{
 			background-color: $menu-active-color;
+		}
+	}
+
+	input{
+		padding: 2px 0.5rem;
+		line-height: $search-line-height;
+		&:hover,
+		&:focus{
+			box-shadow: 0 0 1px $menu-hover-color inset;
 		}
 	}
 }

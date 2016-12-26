@@ -53,11 +53,11 @@ $menu-height: 20px;
 	}
 
 	li{
-		padding: 0 1rem;
+		padding: 3px 1rem;
 		text-align: center;
 	}
 
-	&>ul>li:last-of-type{
+	&>ul>li:nth-last-child(-n+2){
 		position: relative;
 
 		ul{
@@ -70,5 +70,10 @@ $menu-height: 20px;
 			left: 100% !important;
 			top: 0 !important;
 		}
+	}
+
+	input{
+		outline: none;
+		border: none;
 	}
 }

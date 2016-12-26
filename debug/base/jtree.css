@@ -31,14 +31,17 @@
   .dt-menu a {
     line-height: 20px; }
   .dt-menu li {
-    padding: 0 1rem;
+    padding: 3px 1rem;
     text-align: center; }
-  .dt-menu > ul > li:last-of-type {
+  .dt-menu > ul > li:nth-last-child(-n+2) {
     position: relative; }
-    .dt-menu > ul > li:last-of-type ul {
+    .dt-menu > ul > li:nth-last-child(-n+2) ul {
       display: none; }
-    .dt-menu > ul > li:last-of-type:hover ul {
+    .dt-menu > ul > li:nth-last-child(-n+2):hover ul {
       display: block !important;
       position: absolute !important;
       left: 100% !important;
       top: 0 !important; }
+  .dt-menu input {
+    outline: none;
+    border: none; }

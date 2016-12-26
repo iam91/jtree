@@ -154,22 +154,30 @@
             NODE_ICON_FOLDER    : 'dt-node__icon--folder',
             NODE_ICON_OPEN      : 'dt-node__icon--open',
             NODE_TITLE          : 'dt-node__title',
+            NODE_TITLE_FOUND    : 'dt-node__title--found',
 
-            MENU                : 'dt-menu'
+            MENU                : 'dt-menu',
+            SEARCH              : 'dt-search'
         },
 
         MENU : {
             TPL:
             '<ul class="dt-menu">' +
-        		'<li><a name="create">Create</a></li>' +
-        		'<li><a name="delete">Delete</a></li>' +
-        		'<li><a name="rename">Rename</a></li>' +
+        		'<li><a name="create">create</a></li>' +
+        		'<li><a name="delete">delete</a></li>' +
+        		'<li><a name="rename">rename</a></li>' +
+            	'<li>' +
+                    '<a name="search">search</a>' +
+                    '<ul>' +
+                        '<li><input class="dt-search" type="text" placeholder="Keywords"></li>' +
+                    '</ul>' +
+                '</li>' +
         		'<li>' +
         			'<a>Edit</a>' +
         			'<ul>' +
-        				'<li><a name="cut">Cut</a></li>' +
-        				'<li><a name="copy">Copy</a></li>' +
-        				'<li><a name="paste">Paste</a></li>' +
+        				'<li><a name="cut">cut</a></li>' +
+        				'<li><a name="copy">copy</a></li>' +
+        				'<li><a name="paste">paste</a></li>' +
         			'</ul>' +
         		'</li>' +
         	'</ul>',
@@ -187,6 +195,12 @@
                 '<div class="dt-node__body"></div>' +
             '</div>',
 
+        /**
+         * Returns the root element of current node when el is icon or title,
+         * otherwise null is returned.
+         * @param {HTMLElement} el
+         * @param {HTMLElement|null}
+         */
         currentNode: function(el){
             if(el.classList.contains(this.CLASS_NAME.NODE_ICON)){
                 return el.parentNode.parentNode.parentNode;
@@ -289,11 +303,10 @@
                 ic.classList.add(CLASS_NAME.NODE_ICON_FOLDER);
             }
 
-             //todo add mime
-
-
              if(typeof data.children === 'string'){
-                 //todo lazy load children
+                 /**
+                  * @todo lazy load children
+                  */
                  this._lazy = true;
              }else if(data.children instanceof Array){
                  //render children
@@ -384,6 +397,29 @@
             }else{
                 this.expand();
             }
+        },
+
+        /**
+         * @param {String} keywords
+         */
+        search: function(keywords){
+            var r = false;
+            var title = View.getTitle(this._el);
+            title.classList.remove(CLASS_NAME.NODE_TITLE_FOUND);
+            for(var i = 0; i < this._children.length; i++){
+                r = this._children[i].search(keywords) || r;
+            }
+            if(this._data.title.indexOf(keywords) >= 0){
+                /**
+                 * @todo add more flexible searching
+                 */
+                r = true;
+                title.classList.add(CLASS_NAME.NODE_TITLE_FOUND);
+            }
+            if(r){
+                this.expand();
+            }
+            return r;
         },
 
     	/** Following are basic function (related to data model) **/
@@ -564,6 +600,9 @@
             //Disable edit
             U.addHandler(this._el, 'blur', U.setScope(this, this._disableEdit), true);
             U.addHandler(this._el, 'keydown', U.setScope(this, this._disableEdit));
+            //Search
+            U.addHandler(this._elMenu, 'blur', U.setScope(this, this._search), true);
+            U.addHandler(this._elMenu, 'keydown', U.setScope(this, this._search));
          },
 
          _showMenu: function(el){
@@ -572,8 +611,12 @@
          },
 
          _hideMenu: function(){
-             this._elMenu.remove();
-             this._menuShowing = false;
+             try{
+                 this._elMenu.remove();
+             }catch(ex){
+             }finally{
+                 this._menuShowing = false;
+             }
          },
 
          /** Following are event handlers **/
@@ -582,9 +625,12 @@
              var target = e.target;
              var currNodeEl = View.currentNode(target);
              if(currNodeEl){
+                //icon or title is clicked
                 var currNode = this._tokenPool.get(currNodeEl.dataset.dtToken);
                 currNode.toggleChildren();
              }
+             //if title is marked as found, remove found state when cliked
+             target.classList.remove(CLASS_NAME.NODE_TITLE_FOUND);
          },
 
          _toggleMenu: function(e){
@@ -598,7 +644,8 @@
                  }else{
                      this._hideMenu();
                  }
-             }else{
+             }else if(!target.classList.contains(CLASS_NAME.SEARCH)){
+                 //not the searching box clicked
                  if(this._menuShowing){
                      this._hideMenu();
                  }
@@ -620,19 +667,37 @@
          _enableEdit: function(e){
      		var title = e.target;
              var currNodeEl = View.currentNode(title);
-             var currNode = this._tokenPool.get(currNodeEl.dataset.dtToken);
-             currNode.enableEdit();
+             if(currNodeEl){
+                 //title focused
+                 var currNode = this._tokenPool.get(currNodeEl.dataset.dtToken);
+                 currNode.enableEdit();
+             }
          },
 
          _disableEdit: function(e){
-     		if(e.type === 'blur' ||
-     		   e.type === 'keydown' && e.keyCode == ENTER){
-         		var title = e.target;
+     		if((e.type === 'blur' ||
+     		   e.type === 'keydown' && e.keyCode == ENTER) &&
+               e.target.contentEditable === 'true'){
+                 //event triggered by editable title
+         		 var title = e.target;
                  var currNodeEl = View.currentNode(title);
                  var currNode = this._tokenPool.get(currNodeEl.dataset.dtToken);
                  currNode.disableEdit();
                  currNode.rename();
              }
+         },
+
+         _search: function(e){
+             if((e.type === 'blur' ||
+                e.type === 'keydown' && e.keyCode == ENTER) &&
+                e.target.classList.contains(CLASS_NAME.SEARCH)){
+                //event triggered by searching box
+                var keywords = e.target.value;
+                var currNodeEl = View.menuParent(this._elMenu);
+                var currNode = this._tokenPool.get(currNodeEl.dataset.dtToken);
+                currNode.search(keywords);
+                this._hideMenu();
+            }
          },
 
          /** Above are event handlers **/
