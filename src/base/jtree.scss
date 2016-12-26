@@ -13,7 +13,7 @@ $menu-height: 20px;
 }
 
 //structure
-.dt-node:before{
+.dt-node::before{
 	content: "";
 	display: inline-block;
 	width: $indent;
@@ -72,7 +72,7 @@ $menu-height: 20px;
 		}
 	}
 
-	input{
+	.dt-search{
 		outline: none;
 		border: none;
 	}

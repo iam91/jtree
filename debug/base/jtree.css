@@ -1,4 +1,4 @@
-.dt-node:before {
+.dt-node::before {
   content: "";
   display: inline-block;
   width: 14px; }
@@ -42,6 +42,6 @@
       position: absolute !important;
       left: 100% !important;
       top: 0 !important; }
-  .dt-menu input {
+  .dt-menu .dt-search {
     outline: none;
     border: none; }

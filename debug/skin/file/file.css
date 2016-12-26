@@ -81,20 +81,38 @@
  * Menu styles
  */
 .dt-menu {
+  margin: 0.5rem;
+  left: 50%;
   background-color: white; }
+  .dt-menu::before {
+    content: "";
+    left: 5px;
+    position: absolute;
+    top: -18px;
+    border: 9px solid transparent;
+    border-bottom-color: rgba(0, 0, 0, 0.15); }
+  .dt-menu > ul::before {
+    content: "";
+    left: 5px;
+    position: absolute;
+    top: -16px;
+    border: 8px solid transparent;
+    border-bottom-color: white; }
   .dt-menu ul {
-    border-radius: 1px;
-    box-shadow: 1px 1px 3px #395ea6; }
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 2px;
+    transition: box-shadow 0.1s linear; }
+    .dt-menu ul:hover {
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15); }
   .dt-menu li:hover {
     color: white;
-    background-color: #2ea1d9;
-    box-shadow: 0 0 1px #2ea1d9; }
+    background-color: #2ea1d9; }
     .dt-menu li:hover ul {
       color: #59606d; }
   .dt-menu li:active {
     background-color: #395ea6; }
-  .dt-menu input {
+  .dt-menu .dt-search {
     padding: 2px 0.5rem;
     line-height: 20px; }
-    .dt-menu input:hover, .dt-menu input:focus {
+    .dt-menu .dt-search:hover, .dt-menu .dt-search:focus {
       box-shadow: 0 0 1px #2ea1d9 inset; }

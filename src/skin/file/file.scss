@@ -78,25 +78,51 @@ $mime-icon:
 /**
  * Menu styles
  */
+$menu-bg-color: white;
+$menu-border: 1px solid rgba(0,0,0,0.15);
 $menu-hover-color: #2ea1d9;
 $menu-active-color: #395ea6;
-$menu-shadow-color: #395ea6;
+$menu-shadow: 0 3px 12px rgba(0,0,0,0.15);
 
 $search-line-height: 20px;
 
+@mixin arrow($size, $border-color){
+	position: absolute;
+	top: -$size * 2;
+	border: $size solid transparent;
+	border-bottom-color: $border-color;
+}
+
 .dt-menu{
-	background-color: white;
+	margin: 0.5rem;
+	left: 50%;
+	background-color: $menu-bg-color;
+
+	&::before{
+		content: "";
+		left: 5px;
+		@include arrow(9px, rgba(0,0,0,0.15));
+	}
+
+	&>ul::before{
+		content: "";
+		left: 5px;
+		@include arrow(8px, $menu-bg-color);
+	}
 
 	ul{
-		border-radius: 1px;
-		box-shadow: 1px 1px 3px $menu-shadow-color;
+		border: $menu-border;
+		border-radius: 2px;
+		transition: box-shadow 0.1s linear;
+		&:hover{
+			box-shadow: $menu-shadow;
+		}
 	}
 
 	li{
 		&:hover{
 			color: white;
 			background-color: $menu-hover-color;
-			box-shadow: 0 0 1px $menu-hover-color;
 			ul{
 				color: $font-color;
 			}
@@ -106,7 +132,7 @@ $search-line-height: 20px;
 		}
 	}
 
-	input{
+	.dt-search{
 		padding: 2px 0.5rem;
 		line-height: $search-line-height;
 		&:hover,

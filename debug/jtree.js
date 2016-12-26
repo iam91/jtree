@@ -180,7 +180,7 @@
         				'<li><a name="paste">paste</a></li>' +
         			'</ul>' +
         		'</li>' +
-        	'</ul>',
+            '</ul>',
         },
 
         TPL:
