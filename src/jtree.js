@@ -2,6 +2,10 @@
     'use strict';
 
     /**
+     * @todo 分离数据层操作
+     */
+
+    /**
      * U
      * @namespace
      */
@@ -143,6 +147,10 @@
 
         getIcon: function(el){
             return el.firstChild.firstChild.firstChild;
+        },
+
+        getHead: function(el){
+            return el.firstChild.firstChild;
         },
 
         getBody: function(el){
@@ -489,7 +497,8 @@
          },
 
          _showMenu: function(el){
-             el.appendChild(this._elMenu);
+             var head = View.getHead(el);
+             head.appendChild(this._elMenu);
              this._menuShowing = true;
          },
 

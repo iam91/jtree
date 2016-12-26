@@ -1,5 +1,6 @@
 //variables
-$indent: 1rem;
+$indent: 14px;
+$zindex-max: 99999;
 
 //mixins
 @mixin user-select-none{
@@ -22,6 +23,7 @@ $indent: 1rem;
 
 .dt-node__head{
 	cursor: default;
+	position: relative;
 	@include user-select-none;
 }
 
@@ -31,4 +33,13 @@ $indent: 1rem;
 
 .dt-node__body--open{
 	display: block;
+}
+
+.dt-menu{
+	position: absolute;
+	z-index: $zindex-max;
+	ul{
+		list-style-type: none;
+	}
+
 }

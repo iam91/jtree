@@ -1,0 +1,51 @@
+$icon-size: 16px;
+$font-size: 12px;
+$font-color: #59606d;
+$font-active-color: #282f44;
+$font-stack: "Helvetica Neue",
+			 Helvetica,
+			 'microsoft yahei ui',
+			 'microsoft yahei',
+			 'simhei',
+			 Arial,
+			 sans-serif;
+
+.dt-node__wrap{
+	color: $font-color;
+	font-size: $font-size;
+	font-family: $font-stack;
+}
+
+.dt-node__head{
+	padding: 2px 0;
+}
+
+.dt-node__title{
+	line-height: $icon-size;
+	&:hover{
+		text-decoration: underline;
+	}
+	&:active{
+		color: $font-active-color;
+	}
+}
+
+[class^="dt-node__icon"]{
+	width: $icon-size;
+	height: $icon-size;
+	margin: 0 3px;
+	display: inline-block;
+	vertical-align: text-bottom;
+}
+
+.dt-node__icon--folder{
+	background-image: url('./folder-close.svg');
+}
+
+.dt-node__icon--file{
+	background-image: url('./file.svg');
+}
+
+.dt-node__icon--open{
+	background-image: url('./folder-open.svg');
+}

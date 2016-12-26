@@ -57,7 +57,7 @@ gulp.task('icon', function(){
 
 gulp.task('default', function(){
 	gulp.run('lint', 'basesass', 'scripts', 'icon');
-	gulp.watch(['./src/**/*.js', './src/base/**/*.scss', './src/**/*.svg'], function(){
+	gulp.watch(['./src/**/*.js', './src/**/*.scss', './src/**/*.svg'], function(){
 		gulp.run('lint', 'basesass', 'scripts', 'icon');
 	});
 });
