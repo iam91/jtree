@@ -88,6 +88,7 @@ $menu-hover-color: #2ea1d9;
 $menu-active-color: #395ea6;
 $menu-shadow: 0 3px 12px rgba(0,0,0,0.15);
 
+$search-color: #f9f5f0;
 $search-line-height: 20px;
 
 @mixin menu-border(){
@@ -147,9 +148,11 @@ $search-line-height: 20px;
 	.dt-search{
 		padding: 2px 0.5rem;
 		line-height: $search-line-height;
+		background-color: $search-color;
 		&:hover,
 		&:focus{
 			box-shadow: 0 0 1px $menu-hover-color inset;
+			background-color: white;
 		}
 	}
 }

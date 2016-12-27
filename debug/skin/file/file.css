@@ -120,6 +120,8 @@
     background-color: #395ea6; }
   .dt-menu .dt-search {
     padding: 2px 0.5rem;
-    line-height: 20px; }
+    line-height: 20px;
+    background-color: #f9f5f0; }
     .dt-menu .dt-search:hover, .dt-menu .dt-search:focus {
-      box-shadow: 0 0 1px #2ea1d9 inset; }
+      box-shadow: 0 0 1px #2ea1d9 inset;
+      background-color: white; }
