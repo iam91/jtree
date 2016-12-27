@@ -1,6 +1,9 @@
 /**
  * Tree styles
  */
+.dt-node--sel {
+  border: 1px solid black; }
+
 .dt-node__wrap {
   color: #59606d;
   font-size: 14px;
@@ -8,6 +11,18 @@
 
 .dt-node__head {
   padding: 2px 0; }
+
+.dt-node__switch {
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 10px solid #499491;
+  margin: 0 0px;
+  display: inline-block;
+  margin: 5px 0;
+  vertical-align: text-bottom; }
+
+.dt-node__switch--open {
+  transform: rotate(90deg); }
 
 .dt-node__title {
   line-height: 20px; }

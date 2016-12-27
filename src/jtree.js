@@ -3,6 +3,7 @@
 
     /**
      * @todo 分离数据层操作
+     * @todo add mime
      */
 
     /**
@@ -178,6 +179,8 @@
             NODE_HEAD: 'dt-node__head',
             NODE_BODY: 'dt-node__body',
             NODE_BODY_OPEN: 'dt-node__body--open',
+            NODE_SWITCH: 'dt-node__switch',
+            NODE_SWITCH_OPEN: 'dt-node__switch--open',
             NODE_ICON_LOADING: 'dt-node__icon--loading',
             NODE_ICON_FOLDER: 'dt-node__icon--folder',
             NODE_ICON_OPEN: 'dt-node__icon--open',
@@ -186,7 +189,9 @@
             NODE_TITLE_FOUND: 'dt-node__title--found',
 
             MENU: 'dt-menu',
-            SEARCH: 'dt-search'
+            SEARCH: 'dt-search',
+
+            SELECTED: 'dt-node--sel'
         },
 
         MENU: {
@@ -215,8 +220,8 @@
 
         TPL: '<div class="dt-node__wrap">' +
                 '<div class="dt-node__head">' +
-                    '<span>' +
-                    '</span>' +
+                    '<span class="dt-node__switch"></span>' +
+                    '<span></span>' +
                     '<span class="dt-node__title">' +
                         '{title}' +
                     '</span>' +
@@ -235,13 +240,19 @@
                 return el.parentNode.parentNode.parentNode;
             } else if (el.classList.contains(this.CLASS_NAME.NODE_TITLE)) {
                 return el.parentNode.parentNode.parentNode;
+            } else if (el.classList.contains(this.CLASS_NAME.NODE_SWITCH)) {
+                return el.parentNode.parentNode.parentNode;
             } else {
                 return null;
             }
         },
 
-        getIcon: function(el) {
+        getSwitch: function(el){
             return el.firstChild.firstChild.firstChild;
+        },
+
+        getIcon: function(el) {
+            return el.firstChild.firstChild.firstChild.nextElementSibling;
         },
 
         getHead: function(el) {
@@ -253,7 +264,7 @@
         },
 
         getTitle: function(el) {
-            return el.firstChild.firstChild.firstChild.nextElementSibling;
+            return el.firstChild.firstChild.firstChild.nextElementSibling.nextElementSibling;
         },
 
         appendMenu: function(el, menu) {
@@ -307,6 +318,7 @@
         this._parent = parent || null;
 
         this._lazy = false;
+        this._selected = false;
         this._expanded = false;
         this._isEditing = false;
 
@@ -418,9 +430,10 @@
 
         expand: function() {
             if (this._data.type == NODE_TYPE.FOLDER) {
+                var sw = View.getSwitch(this._el);
                 var ic = View.getIcon(this._el);
                 var bd = View.getBody(this._el);
-
+                sw.classList.add(CLASS_NAME.NODE_SWITCH_OPEN);
                 ic.classList.add(CLASS_NAME.NODE_ICON_OPEN);
                 bd.classList.add(CLASS_NAME.NODE_BODY_OPEN);
                 this._expanded = true;
@@ -429,9 +442,10 @@
 
         fold: function() {
             if (this._data.type == NODE_TYPE.FOLDER) {
+                var sw = View.getSwitch(this._el);
                 var ic = View.getIcon(this._el);
                 var bd = View.getBody(this._el);
-
+                sw.classList.remove(CLASS_NAME.NODE_SWITCH_OPEN);
                 ic.classList.remove(CLASS_NAME.NODE_ICON_OPEN);
                 bd.classList.remove(CLASS_NAME.NODE_BODY_OPEN);
                 this._expanded = false;
@@ -557,6 +571,23 @@
 
         /** Above are basic functions **/
 
+        select: function(){
+            this._selected = true;
+            var elHead = View.getHead(this._el);
+            console.log(elHead);
+            elHead.classList.add(CLASS_NAME.SELECTED);
+        },
+
+        unselect: function(){
+            this._selected = false;
+            var elHead = View.getHead(this._el);
+            elHead.classList.remove(CLASS_NAME.SELECTED);
+        },
+
+        isSelected: function(){
+            return this._selected;
+        },
+
         /**
          * @public
          * @return {HTMLElement}
@@ -604,7 +635,7 @@
      */
 
     function Tree(data, el) {
-        this._data = data || null;
+        this._data = U.deepCopy(data) || null;
         this._tokenPool = new Tokens();
 
         this._el = el || null;
@@ -613,6 +644,7 @@
 
         this._menuShowing = false;
         this._clipBoard = null;
+        this._selectedNode = null;
 
         this._init();
     }
@@ -644,8 +676,11 @@
         },
 
         _bind: function() {
+            //Select
+            U.addHandler(this._el, 'click', U.setScope(this, this._select));
             //Toggle children
             U.addHandler(this._el, 'click', U.setScope(this, this._toggleChildren));
+            U.addHandler(this._el, 'dblclick', U.setScope(this, this._toggleChildren));
             //Toggle menu
             U.addHandler(this._el, 'contextmenu', U.setScope(this, this._toggleMenu));
             U.addHandler(window, 'click', U.setScope(this, this._toggleMenu));
@@ -675,17 +710,40 @@
         },
 
         /** Following are event handlers **/
+        _select: function(e){
+            var target = e.target;
+            var type = e.type;
+            if(type === 'click' && target.classList.contains(CLASS_NAME.NODE_TITLE)){
+                var currNodeEl = View.currentNode(target);
+                if (currNodeEl) {
+                    //title is clicked
+                    if(this._selectedNode){
+                        this._selectedNode.unselect();
+                    }
+                    this._selectedNode = this._tokenPool.get(currNodeEl.dataset.dtToken);
+                    this._selectedNode.select();
+                    //if title is marked as found, remove found state when cliked
+                    target.classList.remove(CLASS_NAME.NODE_TITLE_FOUND);
+                }
+            }
+        },
 
         _toggleChildren: function(e) {
             var target = e.target;
-            var currNodeEl = View.currentNode(target);
-            if (currNodeEl) {
-                //icon or title is clicked
-                var currNode = this._tokenPool.get(currNodeEl.dataset.dtToken);
-                currNode.toggleChildren();
+            var type = e.type;
+
+            var currNodeEl = null;
+            var currNode = null;
+
+            if(type === 'click' && target.classList.contains(CLASS_NAME.NODE_SWITCH) ||
+                type === 'dblclick' && target.classList.contains(CLASS_NAME.NODE_TITLE)){
+                currNodeEl = View.currentNode(target);
+                if (currNodeEl) {
+                    //icon is clicked title is dbl clicked
+                    currNode = this._tokenPool.get(currNodeEl.dataset.dtToken);
+                    currNode.toggleChildren();
+                }
             }
-            //if title is marked as found, remove found state when cliked
-            target.classList.remove(CLASS_NAME.NODE_TITLE_FOUND);
         },
 
         _toggleMenu: function(e) {
@@ -705,7 +763,7 @@
             }else if(type === 'click'){
                 if(e.button === 0){
                     //in case that for ff, click will be triggered after contextmenu
-                    if(this._menuShowing){
+                    if(this._menuShowing && !target.classList.contains(CLASS_NAME.SEARCH)){
                         this._hideMenu();
                     }
                 }
@@ -770,6 +828,13 @@
          */
         $element: function() {
             return this._el;
+        },
+
+        /**
+         * @return {Object}
+         */
+        $data: function(){
+            return this._data;
         }
 
     };

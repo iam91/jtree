@@ -22,6 +22,21 @@ $mime-icon:
 	'txt' 'pdf' 'zip'
 	'loading' 'unknown';
 
+$sw-size: 10px;
+$sw-color: #499491;
+
+@mixin switch($sw-width, $sw-length, $color){
+	border-top: $sw-width / 2 solid transparent;
+	border-bottom: $sw-width / 2 solid transparent;
+	border-left: $sw-length solid $color;
+	margin: 0 ($sw-size - $sw-width) / 2;
+	display: inline-block;
+}
+
+.dt-node--sel{
+	border: 1px solid black;
+}
+
 .dt-node__wrap{
 	color: $font-color;
 	font-size: $font-size;
@@ -30,6 +45,16 @@ $mime-icon:
 
 .dt-node__head{
 	padding: 2px 0;
+}
+
+.dt-node__switch{
+	@include switch($sw-size, $sw-size, $sw-color);
+	margin: ($icon-size - $sw-size) / 2 0;
+	vertical-align: text-bottom;
+}
+
+.dt-node__switch--open{
+	transform: rotate(90deg);
 }
 
 .dt-node__title{
