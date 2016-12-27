@@ -68,6 +68,9 @@
 .dt-node__icon--zip {
   background-image: url(./icons/zip.svg); }
 
+.dt-node__icon--loading {
+  background-image: url(./icons/loading.svg); }
+
 .dt-node__icon--unknown {
   background-image: url(./icons/unknown.svg); }
 

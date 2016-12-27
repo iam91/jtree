@@ -6,6 +6,37 @@
      */
 
     /**
+     * Ajax
+     * @namespace
+     */
+    var Ajax = {
+        /**
+         * @todo add timeout and other data format except for json
+         */
+        get: function(url, success, error){
+            if(url){
+                var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function(){
+                    if(xhr.readyState === 4){
+                        if(xhr.status === 200){
+                            var data = JSON.parse(xhr.responseText);
+                            if(success instanceof Function){
+                                success(data);
+                            }
+                        }else{
+                            if(error instanceof Function){
+                                error();
+                            }
+                        }
+                    }
+                };
+                xhr.open('GET', url, true);
+                xhr.send(null);
+            }
+        }
+    };
+
+    /**
      * U
      * @namespace
      */
@@ -306,9 +337,6 @@
             }
 
             if (typeof data.children === 'string') {
-                /**
-                 * @todo lazy load children
-                 */
                 this._lazy = true;
             } else if (data.children instanceof Array) {
                 //render children
@@ -334,6 +362,23 @@
             var token = this._tokenPool.add(this);
             this._el.dataset.dtToken = token;
             this._token = token;
+        },
+
+        _loadSuccess: function(newData){
+            if(newData){
+                var child = new TreeNode(this._tokenPool, newData, this);
+                this.appendChild(child);
+                //handle data model
+                this._data.children = [newData];
+            }
+            var ic = View.getIcon(this._el);
+            ic.classList.remove(CLASS_NAME.NODE_ICON_LOADING);
+            ic.classList.add(CLASS_NAME.NODE_ICON_FOLDER);
+            this.expand();
+        },
+
+        _loadError: function(){
+            alert(this._data.title + ' load error!');
         },
 
         /**
@@ -396,6 +441,15 @@
         toggleChildren: function() {
             if (this._expanded) {
                 this.fold();
+            } else if (this._lazy && typeof this._data.children === 'string') {
+                //load the async data
+                var url = this._data.children;
+                Ajax.get(url,
+                    U.setScope(this, this._loadSuccess),
+                    U.setScope(this, this._loadError));
+                var ic = View.getIcon(this._el);
+                ic.classList.remove(CLASS_NAME.NODE_ICON_FOLDER);
+                ic.classList.add(CLASS_NAME.NODE_ICON_LOADING);
             } else {
                 this.expand();
             }
@@ -649,7 +703,7 @@
                     }
                 }
             }else if(type === 'click'){
-                if(e.button == 0){
+                if(e.button === 0){
                     //in case that for ff, click will be triggered after contextmenu
                     if(this._menuShowing){
                         this._hideMenu();
