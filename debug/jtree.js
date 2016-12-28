@@ -192,6 +192,7 @@
             MENU: 'dt-menu',
             SEARCH: 'dt-search',
 
+            COVERED: 'dt-node--covered',
             SELECTED: 'dt-node--sel',
             SELECTED_BLUR: 'dt-node--selblur'
         },
@@ -324,6 +325,8 @@
         this._expanded = false;
         this._isEditing = false;
 
+        this._isFolder = false;
+
         this._init(tokenPool);
     }
 
@@ -348,8 +351,10 @@
                 } else {
                     ic.classList.add(CLASS_NAME.NODE_ICON_UNKNOWN);
                 }
+                this._isFolder = false;
             } else if (data.type === NODE_TYPE.FOLDER) {
                 ic.classList.add(CLASS_NAME.NODE_ICON_FOLDER);
+                this._isFolder = true;
             }
 
             if (typeof data.children === 'string') {
@@ -370,6 +375,7 @@
             //create element
             this._el = document.createElement('div');
             this._el.classList.add(CLASS_NAME.NODE);
+            this._el.draggable = 'true';
 
             //render template
             this._el.innerHTML = View.TPL.replace('{title}', data.title);
@@ -433,7 +439,7 @@
         },
 
         expand: function() {
-            if (this._data.type == NODE_TYPE.FOLDER) {
+            if (this._isFolder) {
                 var sw = View.getSwitch(this._el);
                 var ic = View.getIcon(this._el);
                 var bd = View.getBody(this._el);
@@ -445,7 +451,7 @@
         },
 
         fold: function() {
-            if (this._data.type == NODE_TYPE.FOLDER) {
+            if (this._isFolder) {
                 var sw = View.getSwitch(this._el);
                 var ic = View.getIcon(this._el);
                 var bd = View.getBody(this._el);
@@ -541,7 +547,7 @@
          * @param {TreeNode} node
          */
         paste: function(node) {
-            if (node && this._data.type == NODE_TYPE.FOLDER) {
+            if (node && this._isFolder) {
                 this.appendChild(node);
                 this.expand();
                 //handle model
@@ -576,26 +582,40 @@
         /** Above are basic functions **/
 
         selBlur: function(){
-            var elHead = View.getTitle(this._el);
-            elHead.classList.add(CLASS_NAME.SELECTED_BLUR);
+            var elTitle = View.getTitle(this._el);
+            elTitle.classList.add(CLASS_NAME.SELECTED_BLUR);
         },
 
         select: function(){
             this._selected = true;
-            var elHead = View.getTitle(this._el);
-            elHead.classList.remove(CLASS_NAME.SELECTED_BLUR);
-            elHead.classList.add(CLASS_NAME.SELECTED);
+            var elTitle = View.getTitle(this._el);
+            elTitle.classList.remove(CLASS_NAME.SELECTED_BLUR);
+            elTitle.classList.add(CLASS_NAME.SELECTED);
         },
 
         unselect: function(){
             this._selected = false;
-            var elHead = View.getTitle(this._el);
-            elHead.classList.remove(CLASS_NAME.SELECTED);
-            elHead.classList.remove(CLASS_NAME.SELECTED_BLUR);
+            var elTitle = View.getTitle(this._el);
+            elTitle.classList.remove(CLASS_NAME.SELECTED);
+            elTitle.classList.remove(CLASS_NAME.SELECTED_BLUR);
+        },
+
+        cover: function(){
+            var elTitle = View.getTitle(this._el);
+            elTitle.classList.add(CLASS_NAME.COVERED);
+        },
+
+        uncover: function(){
+            var elTitle = View.getTitle(this._el);
+            elTitle.classList.remove(CLASS_NAME.COVERED);
         },
 
         isSelected: function(){
             return this._selected;
+        },
+
+        isFolder: function(){
+            return this._isFolder;
         },
 
         /**
@@ -655,6 +675,7 @@
         this._menuShowing = false;
         this._clipBoard = null;
         this._selectedNode = null;
+        this._draggedNode = null;
 
         this._init();
     }
@@ -706,7 +727,15 @@
             U.addHandler(this._elMenu, 'keydown', U.setScope(this, this._search));
             //outer click
             U.addHandler(window, 'click', U.setScope(this, this._selBlur));
+            /////////////
+            U.addHandler(this._el, 'dragstart', U.setScope(this, this._dragStart));
+            U.addHandler(this._el, 'dragenter', U.setScope(this, this._dragCover));
+            U.addHandler(this._el, 'dragleave', U.setScope(this, this._dragCover));
+            U.addHandler(this._el, 'dragover', U.setScope(this, this._dragOver));
+            U.addHandler(this._el, 'drop', U.setScope(this, this._dragDrop));
+            /////////////
         },
+        
 
         _showMenu: function(el) {
             View.appendMenu(el, this._elMenu);
@@ -722,6 +751,55 @@
         },
 
         /** Following are event handlers **/
+
+        _dragStart: function(e){
+            var target = e.target;
+            var currNode = this._tokenPool.get(target.dataset.dtToken);
+            currNode.fold();
+            this._draggedNode = currNode;
+            //for firfox, drag image should be triggered by setData?
+            e.dataTransfer.setData('text/html', '');
+            e.dataTransfer.setDragImage(target, 0, 0);
+        },
+
+        _dragCover: function(e){
+            var target = e.target;
+
+            //for firfox, this event's target is a #text node
+            target = target.nodeType === 3 ? target.parentNode : target;
+
+            if(target.classList.contains(CLASS_NAME.NODE_TITLE)){
+                var currNodeEl = View.currentNode(target);
+                var currNode = this._tokenPool.get(currNodeEl.dataset.dtToken);
+                if(e.type === 'dragenter'){
+                    currNode.cover();
+                    currNode.expand();
+                }else if(e.type === 'dragleave'){
+                    currNode.uncover();
+                }
+            }
+        },
+
+        _dragOver: function(e){
+            e.preventDefault();
+        },
+
+        _dragDrop: function(e){
+            var target = e.target;
+            console.log(target);
+            if(target.classList.contains(CLASS_NAME.NODE_TITLE)){
+                var currNodeEl = View.currentNode(target);
+                var currNode = this._tokenPool.get(currNodeEl.dataset.dtToken);
+                currNode.uncover();
+
+                if(currNode.isFolder()){
+                    var draggedNode = this._draggedNode;
+                    draggedNode.cut();
+                    currNode.paste(draggedNode);
+                }
+            }
+        },
+
         _selBlur: function(e){
             //select blur
             if(!e.target.classList.contains(CLASS_NAME.SELECTED) && this._selectedNode){

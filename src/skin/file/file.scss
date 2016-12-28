@@ -29,6 +29,8 @@ $sel-border-color: #ff9000;
 $sel-bg-color: #ffee82;
 $selblur-bg-color: #f2ead3;
 
+$cover-color: #defbc2;
+
 @mixin switch($sw-width, $sw-length, $color){
 	border-top: $sw-width / 2 solid transparent;
 	border-bottom: $sw-width / 2 solid transparent;
@@ -47,6 +49,10 @@ $selblur-bg-color: #f2ead3;
 	background-color: $selblur-bg-color;
 }
 
+.dt-node--covered{
+	background-color: $cover-color;
+}
+
 .dt-node__wrap{
 	color: $font-color;
 	font-size: $font-size;
@@ -61,6 +67,7 @@ $selblur-bg-color: #f2ead3;
 	@include switch($sw-size, $sw-size, $sw-color);
 	margin: ($icon-size - $sw-size) / 2 0;
 	vertical-align: text-bottom;
+	transition: transform 0.06s linear;
 }
 
 .dt-node__switch--hide{

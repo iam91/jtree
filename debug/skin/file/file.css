@@ -9,6 +9,9 @@
   border-color: #f2ead3;
   background-color: #f2ead3; }
 
+.dt-node--covered {
+  background-color: #defbc2; }
+
 .dt-node__wrap {
   color: #59606d;
   font-size: 14px;
@@ -24,7 +27,8 @@
   margin: 0 0px;
   display: inline-block;
   margin: 5px 0;
-  vertical-align: text-bottom; }
+  vertical-align: text-bottom;
+  transition: transform 0.06s linear; }
 
 .dt-node__switch--hide {
   border-color: transparent; }
