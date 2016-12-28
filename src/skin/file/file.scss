@@ -25,6 +25,10 @@ $mime-icon:
 $sw-size: 10px;
 $sw-color: #499491;
 
+$sel-border-color: #ff9000;
+$sel-bg-color: #ffee82;
+$selblur-bg-color: #f2ead3;
+
 @mixin switch($sw-width, $sw-length, $color){
 	border-top: $sw-width / 2 solid transparent;
 	border-bottom: $sw-width / 2 solid transparent;
@@ -34,7 +38,13 @@ $sw-color: #499491;
 }
 
 .dt-node--sel{
-	border: 1px solid black;
+	border: 1px solid $sel-border-color;
+	background-color: $sel-bg-color;
+}
+
+.dt-node--selblur{
+	border-color: $selblur-bg-color;
+	background-color: $selblur-bg-color;
 }
 
 .dt-node__wrap{
@@ -53,12 +63,17 @@ $sw-color: #499491;
 	vertical-align: text-bottom;
 }
 
+.dt-node__switch--hide{
+	border-color: transparent;
+}
+
 .dt-node__switch--open{
 	transform: rotate(90deg);
 }
 
 .dt-node__title{
 	line-height: $icon-size;
+	padding: 0 2px;
 	&:hover{
 		text-decoration: underline;
 	}

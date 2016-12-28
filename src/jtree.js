@@ -181,6 +181,7 @@
             NODE_BODY_OPEN: 'dt-node__body--open',
             NODE_SWITCH: 'dt-node__switch',
             NODE_SWITCH_OPEN: 'dt-node__switch--open',
+            NODE_SWITCH_HIDE: 'dt-node__switch--hide',
             NODE_ICON_LOADING: 'dt-node__icon--loading',
             NODE_ICON_FOLDER: 'dt-node__icon--folder',
             NODE_ICON_OPEN: 'dt-node__icon--open',
@@ -191,7 +192,8 @@
             MENU: 'dt-menu',
             SEARCH: 'dt-search',
 
-            SELECTED: 'dt-node--sel'
+            SELECTED: 'dt-node--sel',
+            SELECTED_BLUR: 'dt-node--selblur'
         },
 
         MENU: {
@@ -339,6 +341,8 @@
             //add icons
             if (data.type == NODE_TYPE.FILE) {
                 var format = null;
+                var sw = View.getSwitch(this._el);
+                sw.classList.add(CLASS_NAME.NODE_SWITCH_HIDE);
                 if (data.mime && (format = Mime.getFormat(data.mime))) {
                     ic.classList.add(Mime.classname[format]);
                 } else {
@@ -571,17 +575,23 @@
 
         /** Above are basic functions **/
 
+        selBlur: function(){
+            var elHead = View.getTitle(this._el);
+            elHead.classList.add(CLASS_NAME.SELECTED_BLUR);
+        },
+
         select: function(){
             this._selected = true;
-            var elHead = View.getHead(this._el);
-            console.log(elHead);
+            var elHead = View.getTitle(this._el);
+            elHead.classList.remove(CLASS_NAME.SELECTED_BLUR);
             elHead.classList.add(CLASS_NAME.SELECTED);
         },
 
         unselect: function(){
             this._selected = false;
-            var elHead = View.getHead(this._el);
+            var elHead = View.getTitle(this._el);
             elHead.classList.remove(CLASS_NAME.SELECTED);
+            elHead.classList.remove(CLASS_NAME.SELECTED_BLUR);
         },
 
         isSelected: function(){
@@ -694,6 +704,8 @@
             //Search
             U.addHandler(this._elMenu, 'blur', U.setScope(this, this._search), true);
             U.addHandler(this._elMenu, 'keydown', U.setScope(this, this._search));
+            //outer click
+            U.addHandler(window, 'click', U.setScope(this, this._selBlur));
         },
 
         _showMenu: function(el) {
@@ -710,6 +722,13 @@
         },
 
         /** Following are event handlers **/
+        _selBlur: function(e){
+            //select blur
+            if(!e.target.classList.contains(CLASS_NAME.SELECTED) && this._selectedNode){
+                this._selectedNode.selBlur();
+            }
+        },
+
         _select: function(e){
             var target = e.target;
             var type = e.type;

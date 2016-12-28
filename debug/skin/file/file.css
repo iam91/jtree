@@ -2,7 +2,12 @@
  * Tree styles
  */
 .dt-node--sel {
-  border: 1px solid black; }
+  border: 1px solid #ff9000;
+  background-color: #ffee82; }
+
+.dt-node--selblur {
+  border-color: #f2ead3;
+  background-color: #f2ead3; }
 
 .dt-node__wrap {
   color: #59606d;
@@ -21,11 +26,15 @@
   margin: 5px 0;
   vertical-align: text-bottom; }
 
+.dt-node__switch--hide {
+  border-color: transparent; }
+
 .dt-node__switch--open {
   transform: rotate(90deg); }
 
 .dt-node__title {
-  line-height: 20px; }
+  line-height: 20px;
+  padding: 0 2px; }
   .dt-node__title:hover {
     text-decoration: underline; }
   .dt-node__title:active {
