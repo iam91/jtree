@@ -21,8 +21,10 @@
                     if(xhr.readyState === 4){
                         if(xhr.status === 200){
                             var data = JSON.parse(xhr.responseText);
-                            if(success instanceof Function){
-                                success(data);
+                            for(var i = 0; i < success.length; i++){
+                                if(success[i] instanceof Function){
+                                    success[i](data);
+                                }
                             }
                         }else{
                             if(error instanceof Function){
@@ -392,15 +394,38 @@
                 this.appendChild(child);
                 //handle data model
                 this._data.children = [newData];
+                this._lazy = false;
             }
             var ic = View.getIcon(this._el);
             ic.classList.remove(CLASS_NAME.NODE_ICON_LOADING);
             ic.classList.add(CLASS_NAME.NODE_ICON_FOLDER);
-            this.expand();
         },
 
         _loadError: function(){
             alert(this._data.title + ' load error!');
+        },
+
+        /**
+         * @param {Function|Function[]} success callback executed when loading succeeds.
+         */
+        load: function(success){
+            /**
+             * @todo refine async procedure
+             */
+            if (this._lazy && typeof this._data.children === 'string') {
+                //load the async data
+                var url = this._data.children;
+
+                var succ = success instanceof Array ? success : [success];
+                succ.unshift(U.setScope(this, this._loadSuccess));
+
+                Ajax.get(url,
+                    succ,
+                    U.setScope(this, this._loadError));
+                var ic = View.getIcon(this._el);
+                ic.classList.remove(CLASS_NAME.NODE_ICON_FOLDER);
+                ic.classList.add(CLASS_NAME.NODE_ICON_LOADING);
+            }
         },
 
         /**
@@ -425,8 +450,6 @@
             return id;
         },
 
-
-
         enableEdit: function() {
             var title = View.getTitle(this._el);
             U.select(title);
@@ -438,10 +461,13 @@
             U.select();
         },
 
-        expand: function() {
+        /**
+         * @param {Function} callback The callback executed when lazy load succeeds.
+         */
+        expand: function(callback) {
             if (this._isFolder) {
-                var sw = View.getSwitch(this._el);
                 var ic = View.getIcon(this._el);
+                var sw = View.getSwitch(this._el);
                 var bd = View.getBody(this._el);
                 sw.classList.add(CLASS_NAME.NODE_SWITCH_OPEN);
                 ic.classList.add(CLASS_NAME.NODE_ICON_OPEN);
@@ -465,17 +491,12 @@
         toggleChildren: function() {
             if (this._expanded) {
                 this.fold();
-            } else if (this._lazy && typeof this._data.children === 'string') {
-                //load the async data
-                var url = this._data.children;
-                Ajax.get(url,
-                    U.setScope(this, this._loadSuccess),
-                    U.setScope(this, this._loadError));
-                var ic = View.getIcon(this._el);
-                ic.classList.remove(CLASS_NAME.NODE_ICON_FOLDER);
-                ic.classList.add(CLASS_NAME.NODE_ICON_LOADING);
             } else {
-                this.expand();
+                if(this._lazy){
+                    this.load(U.setScope(this, this.expand));
+                }else{
+                    this.expand();
+                }
             }
         },
 
@@ -618,6 +639,10 @@
             return this._isFolder;
         },
 
+        isLazy: function(){
+            return this._lazy;
+        },
+
         /**
          * @public
          * @return {HTMLElement}
@@ -735,7 +760,7 @@
             U.addHandler(this._el, 'drop', U.setScope(this, this._dragDrop));
             /////////////
         },
-        
+
 
         _showMenu: function(el) {
             View.appendMenu(el, this._elMenu);
@@ -773,7 +798,11 @@
                 var currNode = this._tokenPool.get(currNodeEl.dataset.dtToken);
                 if(e.type === 'dragenter'){
                     currNode.cover();
-                    currNode.expand();
+                    if(currNode.isLazy()){
+                        currNode.load(U.setScope(currNode, currNode.expand));
+                    }else{
+                        currNode.expand();
+                    }
                 }else if(e.type === 'dragleave'){
                     currNode.uncover();
                 }
@@ -786,7 +815,6 @@
 
         _dragDrop: function(e){
             var target = e.target;
-            console.log(target);
             if(target.classList.contains(CLASS_NAME.NODE_TITLE)){
                 var currNodeEl = View.currentNode(target);
                 var currNode = this._tokenPool.get(currNodeEl.dataset.dtToken);
