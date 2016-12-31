@@ -21,10 +21,8 @@
                     if(xhr.readyState === 4){
                         if(xhr.status === 200){
                             var data = JSON.parse(xhr.responseText);
-                            for(var i = 0; i < success.length; i++){
-                                if(success[i] instanceof Function){
-                                    success[i](data);
-                                }
+                            if(success instanceof Function){
+                                success(data);
                             }
                         }else{
                             if(error instanceof Function){
@@ -398,6 +396,7 @@
                 this._lazy = false;
             }
             this._stopLoad();
+            this._expand();
         },
 
         _loadError: function(){
@@ -417,24 +416,15 @@
             ic.classList.add(CLASS_NAME.NODE_ICON_FOLDER);
         },
 
-        /**
-         * @param {Function|Function[]} success callback executed when loading succeeds.
-         */
-        load: function(success){
-            /**
-             * @todo refine async procedure
-             */
-            if (this._lazy && typeof this._data.children === 'string') {
-                //load the async data
-                var url = this._data.children;
-
-                var succ = success instanceof Array ? success : [success];
-                succ.unshift(U.setScope(this, this._loadSuccess));
-
-                Ajax.get(url,
-                    succ,
-                    U.setScope(this, this._loadError));
-                this._startLoad();
+        _expand: function(){
+            if (this._isFolder) {
+                var ic = View.getIcon(this._el);
+                var sw = View.getSwitch(this._el);
+                var bd = View.getBody(this._el);
+                sw.classList.add(CLASS_NAME.NODE_SWITCH_OPEN);
+                ic.classList.add(CLASS_NAME.NODE_ICON_OPEN);
+                bd.classList.add(CLASS_NAME.NODE_BODY_OPEN);
+                this._expanded = true;
             }
         },
 
@@ -471,22 +461,7 @@
             U.select();
         },
 
-        _expand: function(){
-            if (this._isFolder) {
-                var ic = View.getIcon(this._el);
-                var sw = View.getSwitch(this._el);
-                var bd = View.getBody(this._el);
-                sw.classList.add(CLASS_NAME.NODE_SWITCH_OPEN);
-                ic.classList.add(CLASS_NAME.NODE_ICON_OPEN);
-                bd.classList.add(CLASS_NAME.NODE_BODY_OPEN);
-                this._expanded = true;
-            }
-        },
-
-        /**
-         * @param {Function} callback The callback executed when lazy load succeeds.
-         */
-        expand: function(callback) {
+        expand: function() {
             if (this._lazy && typeof this._data.children === 'string'){
                 var url = this._data.children;
                 Ajax.get(url,
@@ -494,6 +469,8 @@
                     U.setScope(this, this._loadError)
                 );
                 this._startLoad();
+            } else {
+                this._expand();
             }
         },
 
@@ -513,11 +490,7 @@
             if (this._expanded) {
                 this.fold();
             } else {
-                if(this._lazy){
-                    this.load(U.setScope(this, this.expand));
-                }else{
-                    this.expand();
-                }
+                this.expand();
             }
         },
 
@@ -819,11 +792,7 @@
                 var currNode = this._tokenPool.get(currNodeEl.dataset.dtToken);
                 if(e.type === 'dragenter'){
                     currNode.cover();
-                    if(currNode.isLazy()){
-                        currNode.load(U.setScope(currNode, currNode.expand));
-                    }else{
-                        currNode.expand();
-                    }
+                    currNode.expand();
                 }else if(e.type === 'dragleave'){
                     currNode.uncover();
                 }
