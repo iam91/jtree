@@ -39,6 +39,7 @@
         }
     };
 
+
     /**
      * U
      * @namespace
@@ -344,7 +345,7 @@
             var ic = View.getIcon(this._el);
 
             //add icons
-            if (data.type == NODE_TYPE.FILE) {
+            if (data.type === NODE_TYPE.FILE) {
                 var format = null;
                 var sw = View.getSwitch(this._el);
                 sw.classList.add(CLASS_NAME.NODE_SWITCH_HIDE);
@@ -396,13 +397,24 @@
                 this._data.children = [newData];
                 this._lazy = false;
             }
-            var ic = View.getIcon(this._el);
-            ic.classList.remove(CLASS_NAME.NODE_ICON_LOADING);
-            ic.classList.add(CLASS_NAME.NODE_ICON_FOLDER);
+            this._stopLoad();
         },
 
         _loadError: function(){
-            alert(this._data.title + ' load error!');
+            alert(this._data.title + ' data load error!');
+            this._stopLoad();
+        },
+
+        _startLoad: function(){
+            var ic = View.getIcon(this._el);
+            ic.classList.remove(CLASS_NAME.NODE_ICON_FOLDER);
+            ic.classList.add(CLASS_NAME.NODE_ICON_LOADING);
+        },
+
+        _stopLoad: function(){
+            var ic = View.getIcon(this._el);
+            ic.classList.remove(CLASS_NAME.NODE_ICON_LOADING);
+            ic.classList.add(CLASS_NAME.NODE_ICON_FOLDER);
         },
 
         /**
@@ -422,9 +434,7 @@
                 Ajax.get(url,
                     succ,
                     U.setScope(this, this._loadError));
-                var ic = View.getIcon(this._el);
-                ic.classList.remove(CLASS_NAME.NODE_ICON_FOLDER);
-                ic.classList.add(CLASS_NAME.NODE_ICON_LOADING);
+                this._startLoad();
             }
         },
 
@@ -461,10 +471,7 @@
             U.select();
         },
 
-        /**
-         * @param {Function} callback The callback executed when lazy load succeeds.
-         */
-        expand: function(callback) {
+        _expand: function(){
             if (this._isFolder) {
                 var ic = View.getIcon(this._el);
                 var sw = View.getSwitch(this._el);
@@ -473,6 +480,20 @@
                 ic.classList.add(CLASS_NAME.NODE_ICON_OPEN);
                 bd.classList.add(CLASS_NAME.NODE_BODY_OPEN);
                 this._expanded = true;
+            }
+        },
+
+        /**
+         * @param {Function} callback The callback executed when lazy load succeeds.
+         */
+        expand: function(callback) {
+            if (this._lazy && typeof this._data.children === 'string'){
+                var url = this._data.children;
+                Ajax.get(url,
+                    U.setScope(this, this._loadSuccess),
+                    U.setScope(this, this._loadError)
+                );
+                this._startLoad();
             }
         },
 
