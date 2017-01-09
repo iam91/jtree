@@ -25,7 +25,6 @@ $mime-icon:
 $sw-size: 10px;
 $sw-color: #499491;
 
-$sel-border-color: #ff9000;
 $sel-bg-color: #ffee82;
 $selblur-bg-color: #f2ead3;
 
@@ -39,12 +38,10 @@ $cover-color: #defbc2;
 }
 
 .dt-node--sel{
-	border: 1px solid $sel-border-color;
 	background-color: $sel-bg-color;
 }
 
 .dt-node--selblur{
-	border-color: $selblur-bg-color;
 	background-color: $selblur-bg-color;
 }
 
