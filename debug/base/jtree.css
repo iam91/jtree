@@ -1,10 +1,5 @@
-.dt-node::before {
-  content: "";
-  display: inline-block;
-  width: 14px; }
-
 .dt-node__wrap {
-  display: inline-block; }
+  width: 100%; }
 
 .dt-node__head {
   cursor: default;

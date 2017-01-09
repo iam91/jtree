@@ -174,6 +174,8 @@
      */
     var View = {
 
+        INDENT: 1,
+
         CLASS_NAME: {
             NODE: 'dt-node',
             NODE_WRAP: 'dt-node__wrap',
@@ -309,6 +311,7 @@
         this._data = data;
         this._token = null;
         this._tokenPool = tokenPool;
+        this._depth = parent && (parent.$depth() + 1) || 0;
 
         this._el = null;
 
@@ -380,6 +383,9 @@
 
             //render template
             this._el.innerHTML = View.TPL.replace('{title}', data.title);
+
+            var head = View.getHead(this._el);
+            head.style.paddingLeft = View.INDENT * this._depth + 'rem';
 
             //bind dom with view model
             var token = this._tokenPool.add(this);
@@ -603,16 +609,26 @@
 
         select: function(){
             this._selected = true;
+
+            var elHead = View.getHead(this._el);
+            elHead.classList.remove(CLASS_NAME.SELECTED_BLUR);
+            elHead.classList.add(CLASS_NAME.SELECTED);
+            /*
             var elTitle = View.getTitle(this._el);
             elTitle.classList.remove(CLASS_NAME.SELECTED_BLUR);
-            elTitle.classList.add(CLASS_NAME.SELECTED);
+            elTitle.classList.add(CLASS_NAME.SELECTED);*/
         },
 
         unselect: function(){
             this._selected = false;
+
+            var elHead = View.getHead(this._el);
+            elHead.classList.remove(CLASS_NAME.SELECTED);
+            elHead.classList.remove(CLASS_NAME.SELECTED_BLUR);
+            /*
             var elTitle = View.getTitle(this._el);
             elTitle.classList.remove(CLASS_NAME.SELECTED);
-            elTitle.classList.remove(CLASS_NAME.SELECTED_BLUR);
+            elTitle.classList.remove(CLASS_NAME.SELECTED_BLUR);*/
         },
 
         cover: function(){
@@ -651,6 +667,14 @@
          */
         $data: function() {
             return this._data;
+        },
+
+        /**
+         * @public
+         * @return {Number}
+         */
+        $depth: function(){
+            return this._depth;
         }
     };
     /* ================== Above is TreeNode definition ==================*/

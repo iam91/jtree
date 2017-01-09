@@ -1,5 +1,4 @@
 //variables
-$indent: 14px;
 $zindex-max: 99999;
 
 $menu-height: 20px;
@@ -13,14 +12,9 @@ $menu-height: 20px;
 }
 
 //structure
-.dt-node::before{
-	content: "";
-	display: inline-block;
-	width: $indent;
-}
 
 .dt-node__wrap{
-	display: inline-block;
+	width: 100%;
 }
 
 .dt-node__head{
