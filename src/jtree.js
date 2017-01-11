@@ -4,6 +4,8 @@
     /**
      * @todo 分离数据层操作
      * @todo add mime
+     * @todo 修改样式
+     * @todo 总结html结构模板需要的方法
      */
 
     /**
@@ -224,53 +226,51 @@
                 '</ul></div>',
         },
 
-        TPL: '<div class="dt-node__wrap">' +
-                '<div class="dt-node__head">' +
-                    '<span class="dt-node__switch"></span>' +
-                    '<span></span>' +
-                    '<span class="dt-node__title">' +
-                        '{title}' +
-                    '</span>' +
-                '</div>' +
-                '<div class="dt-node__body"></div>' +
-            '</div>',
+        TPL:'<div class="dt-node__head">' +
+                '<span class="dt-node__switch"></span>' +
+                '<span></span>' +
+                '<span class="dt-node__title">' +
+                    '{title}' +
+                '</span>' +
+            '</div>' +
+            '<div class="dt-node__body"></div>',
 
         /**
-         * Returns the root element of current node when el is icon or title,
+         * Returns the root element of current node when el is icon, title or switcher
          * otherwise null is returned.
          * @param {HTMLElement} el
          * @param {HTMLElement|null}
          */
         currentNode: function(el) {
             if (el.classList.contains(this.CLASS_NAME.NODE_ICON)) {
-                return el.parentNode.parentNode.parentNode;
+                return el.parentNode.parentNode;
             } else if (el.classList.contains(this.CLASS_NAME.NODE_TITLE)) {
-                return el.parentNode.parentNode.parentNode;
+                return el.parentNode.parentNode;
             } else if (el.classList.contains(this.CLASS_NAME.NODE_SWITCH)) {
-                return el.parentNode.parentNode.parentNode;
+                return el.parentNode.parentNode;
             } else {
                 return null;
             }
         },
 
         getSwitch: function(el){
-            return el.firstChild.firstChild.firstChild;
-        },
-
-        getIcon: function(el) {
-            return el.firstChild.firstChild.firstChild.nextElementSibling;
-        },
-
-        getHead: function(el) {
             return el.firstChild.firstChild;
         },
 
+        getIcon: function(el) {
+            return el.firstChild.firstChild.nextElementSibling;
+        },
+
+        getHead: function(el) {
+            return el.firstChild;
+        },
+
         getBody: function(el) {
-            return el.firstChild.lastChild;
+            return el.lastChild;
         },
 
         getTitle: function(el) {
-            return el.firstChild.firstChild.firstChild.nextElementSibling.nextElementSibling;
+            return el.firstChild.firstChild.nextElementSibling.nextElementSibling;
         },
 
         appendMenu: function(el, menu) {
@@ -311,7 +311,7 @@
         this._data = data;
         this._token = null;
         this._tokenPool = tokenPool;
-        this._depth = parent && (parent.$depth() + 1) || 0;
+        this._depth = parent && (parent.getDepth() + 1) || 0;
 
         this._el = null;
 
@@ -372,6 +372,11 @@
             }
         },
 
+        _indent: function(){
+            var head = View.getHead(this._el);
+            head.style.paddingLeft = View.INDENT * this._depth + 'rem';
+        },
+
         _render: function() {
 
             var data = this._data;
@@ -384,8 +389,8 @@
             //render template
             this._el.innerHTML = View.TPL.replace('{title}', data.title);
 
-            var head = View.getHead(this._el);
-            head.style.paddingLeft = View.INDENT * this._depth + 'rem';
+            //indent
+            this._indent();
 
             //bind dom with view model
             var token = this._tokenPool.add(this);
@@ -440,8 +445,9 @@
          */
         appendChild: function(child) {
             var elBody = View.getBody(this._el);
-            elBody.appendChild(child.$element());
+            elBody.appendChild(child.getElem());
             this._children.push(child);
+            child.setDepth(this.getDepth() + 1);
         },
 
         /**
@@ -451,7 +457,7 @@
          */
         removeChild: function(child) {
             var id = this._children.indexOf(child);
-            child.$element().remove();
+            child.getElem().remove();
             this._children.splice(id, 1);
             return id;
         },
@@ -593,7 +599,7 @@
             if (this._parent) {
                 var id = this._parent.removeChild(this);
                 //handle model
-                this._parent.$data().children.splice(id, 1);
+                this._parent.getData().children.splice(id, 1);
                 return this;
             } else {
                 return null;
@@ -657,7 +663,7 @@
          * @public
          * @return {HTMLElement}
          */
-        $element: function() {
+        getElem: function() {
             return this._el;
         },
 
@@ -665,7 +671,7 @@
          * @public
          * @return {Object}
          */
-        $data: function() {
+        getData: function() {
             return this._data;
         },
 
@@ -673,8 +679,23 @@
          * @public
          * @return {Number}
          */
-        $depth: function(){
+        getDepth: function(){
             return this._depth;
+        },
+
+        /**
+         * @public
+         * @param {Number} dep
+         */
+        setDepth: function(dep){
+            this._depth = dep;
+            this._indent();
+            //reset children's depths
+            if(this._children.length){
+                for(var i = 0; i < this._children.length; i++){
+                    this._children[i].setDepth(dep + 1);
+                }
+            }
         }
     };
     /* ================== Above is TreeNode definition ==================*/
@@ -730,7 +751,7 @@
         _init: function() {
             if (this._data) {
                 var root = new TreeNode(this._tokenPool, this._data);
-                this._elRoot = root.$element();
+                this._elRoot = root.getElem();
 
                 if (this._el) {
                     this._el.appendChild(this._elRoot);
@@ -965,14 +986,14 @@
         /**
          * @return {HTMLElement}
          */
-        $element: function() {
+        getElem: function() {
             return this._el;
         },
 
         /**
          * @return {Object}
          */
-        $data: function(){
+        getData: function(){
             return this._data;
         }
 
