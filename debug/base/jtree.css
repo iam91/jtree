@@ -12,7 +12,7 @@
 .dt-node__body {
   display: none; }
 
-.dt-node__body--open {
+.dt-node--open > .dt-node__body {
   display: block; }
 
 .dt-menu {

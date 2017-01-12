@@ -73,6 +73,7 @@
         },
 
         computedStyle: function(elem, attr) {
+            //currentStyle used in IE
             return elem.currentStyle ? elem.currentStyle[attr] :
                 getComputedStyle(elem, null)[attr];
         },
@@ -167,8 +168,7 @@
             }
         }
     }
-
-    Mime.classname = mimeclass;
+    mimeclass.unknown = 'dt-node__icon--unknown';
 
     /**
      * View
@@ -180,26 +180,28 @@
 
         CLASS_NAME: {
             NODE: 'dt-node',
-            NODE_WRAP: 'dt-node__wrap',
+            NODE_OPEN: 'dt-node--open',
+            SELECTED: 'dt-node--sel',
+            SELECTED_BLUR: 'dt-node--selblur',
+            COVERED: 'dt-node--covered',
+
             NODE_HEAD: 'dt-node__head',
+
             NODE_BODY: 'dt-node__body',
-            NODE_BODY_OPEN: 'dt-node__body--open',
+
             NODE_SWITCH: 'dt-node__switch',
-            NODE_SWITCH_OPEN: 'dt-node__switch--open',
             NODE_SWITCH_HIDE: 'dt-node__switch--hide',
+
+            NODE_ICON: 'dt-node__icon',
             NODE_ICON_LOADING: 'dt-node__icon--loading',
             NODE_ICON_FOLDER: 'dt-node__icon--folder',
-            NODE_ICON_OPEN: 'dt-node__icon--open',
-            NODE_ICON_UNKNOWN: 'dt-node__icon--unknown',
+            NODE_ICON_MIME: mimeclass,
+
             NODE_TITLE: 'dt-node__title',
             NODE_TITLE_FOUND: 'dt-node__title--found',
 
             MENU: 'dt-menu',
-            SEARCH: 'dt-search',
-
-            COVERED: 'dt-node--covered',
-            SELECTED: 'dt-node--sel',
-            SELECTED_BLUR: 'dt-node--selblur'
+            SEARCH: 'dt-search'
         },
 
         MENU: {
@@ -228,26 +230,44 @@
 
         TPL:'<div class="dt-node__head">' +
                 '<span class="dt-node__switch"></span>' +
-                '<span></span>' +
+                '<span class="dt-node__icon"></span>' +
                 '<span class="dt-node__title">' +
                     '{title}' +
                 '</span>' +
             '</div>' +
             '<div class="dt-node__body"></div>',
 
+        isIcon: function(el){
+            return el.classList.contains(this.CLASS_NAME.NODE_ICON);
+        },
+
+        isTitle: function(el){
+            return el.classList.contains(this.CLASS_NAME.NODE_TITLE);
+        },
+
+        isHead: function(el){
+            return el.classList.contains(this.CLASS_NAME.NODE_HEAD);
+        },
+
+        isSwitch: function(el){
+            return el.classList.contains(this.CLASS_NAME.NODE_SWITCH);
+        },
+
+        isSelected: function(el){
+            return el.classList.contains(this.CLASS_NAME.SELECTED);
+        },
+
         /**
          * Returns the root element of current node when el is icon, title or switcher
          * otherwise null is returned.
          * @param {HTMLElement} el
-         * @param {HTMLElement|null}
+         * @return {HTMLElement|null}
          */
         currentNode: function(el) {
-            if (el.classList.contains(this.CLASS_NAME.NODE_ICON)) {
+            if(this.isIcon(el) || this.isTitle(el) || this.isSwitch(el)){
                 return el.parentNode.parentNode;
-            } else if (el.classList.contains(this.CLASS_NAME.NODE_TITLE)) {
-                return el.parentNode.parentNode;
-            } else if (el.classList.contains(this.CLASS_NAME.NODE_SWITCH)) {
-                return el.parentNode.parentNode;
+            } else if(this.isHead(el)){
+                return el.parentNode;
             } else {
                 return null;
             }
@@ -271,6 +291,63 @@
 
         getTitle: function(el) {
             return el.firstChild.firstChild.nextElementSibling.nextElementSibling;
+        },
+
+        setIcon: function(el, type, mime){
+            var ic = this.getIcon(el);
+            if(type === NODE_TYPE.FILE){
+                ic.classList.add(this.CLASS_NAME.NODE_ICON_MIME[mime]);
+            }else if(type === NODE_TYPE.FOLDER){
+                ic.classList.add(this.CLASS_NAME.NODE_ICON_FOLDER);
+            }
+        },
+
+        switchHide: function(el){
+            var sw = this.getSwitch(el);
+            sw.classList.add(this.CLASS_NAME.NODE_SWITCH_HIDE);
+        },
+
+        expand: function(el){
+            el.classList.add(this.CLASS_NAME.NODE_OPEN);
+        },
+
+        fold: function(el){
+            el.classList.remove(this.CLASS_NAME.NODE_OPEN);
+        },
+
+        startLoad: function(el){
+            var ic = View.getIcon(el);
+            ic.classList.remove(this.CLASS_NAME.NODE_ICON_FOLDER);
+            ic.classList.add(this.CLASS_NAME.NODE_ICON_LOADING);
+        },
+
+        stopLoad: function(el){
+            var ic = View.getIcon(el);
+            ic.classList.remove(this.CLASS_NAME.NODE_ICON_LOADING);
+            ic.classList.add(this.CLASS_NAME.NODE_ICON_FOLDER);
+        },
+
+        select: function(el){
+            el.classList.add(this.CLASS_NAME.SELECTED);
+            el.classList.remove(this.CLASS_NAME.SELECTED_BLUR);
+        },
+
+        selblur: function(el){
+            el.classList.add(this.CLASS_NAME.SELECTED_BLUR);
+            el.classList.remove(this.CLASS_NAME.SELECTED);
+        },
+
+        unselect: function(el){
+            el.classList.remove(this.CLASS_NAME.SELECTED);
+            el.classList.remove(this.CLASS_NAME.SELECTED_BLUR);
+        },
+
+        cover: function(el){
+            el.classList.add(this.CLASS_NAME.COVER);
+        },
+
+        uncover: function(el){
+            el.classList.remove(this.CLASS_NAME.UNCOVER);
         },
 
         appendMenu: function(el, menu) {
@@ -338,29 +415,15 @@
 
         constructor: TreeNode,
 
-        _init: function() {
-            this._render(this._tokenPool);
-
-            var data = this._data;
-
-            var ic = View.getIcon(this._el);
-
+        _init: function(){
+            this._render();
+            //bind dom with view model
+            this._setToken();
             //add icons
-            if (data.type === NODE_TYPE.FILE) {
-                var format = null;
-                var sw = View.getSwitch(this._el);
-                sw.classList.add(CLASS_NAME.NODE_SWITCH_HIDE);
-                if (data.mime && (format = Mime.getFormat(data.mime))) {
-                    ic.classList.add(Mime.classname[format]);
-                } else {
-                    ic.classList.add(CLASS_NAME.NODE_ICON_UNKNOWN);
-                }
-                this._isFolder = false;
-            } else if (data.type === NODE_TYPE.FOLDER) {
-                ic.classList.add(CLASS_NAME.NODE_ICON_FOLDER);
-                this._isFolder = true;
-            }
+            this._addIcon();
 
+            //set children nodes
+            var data = this._data;
             if (typeof data.children === 'string') {
                 this._lazy = true;
             } else if (data.children instanceof Array) {
@@ -372,30 +435,40 @@
             }
         },
 
+        _addIcon: function(){
+            var data = this._data;
+            //add icons
+            if (data.type === NODE_TYPE.FILE) {
+                //file icon
+                var format = data.mime && Mime.getFormat(data.mime) || 'unknown';
+                View.switchHide(this._el);
+                View.setIcon(this._el, data.type, format);
+                this._isFolder = false;
+            } else if (data.type === NODE_TYPE.FOLDER) {
+                //folder icon
+                View.setIcon(this._el, data.type);
+                this._isFolder = true;
+            }
+        },
+
         _indent: function(){
             var head = View.getHead(this._el);
             head.style.paddingLeft = View.INDENT * this._depth + 'rem';
         },
 
+        _setToken: function(){
+            var token = this._tokenPool.add(this);
+            this._el.dataset.dtToken = token;
+            this._token = token;
+        },
+
         _render: function() {
-
-            var data = this._data;
-
             //create element
             this._el = document.createElement('div');
             this._el.classList.add(CLASS_NAME.NODE);
             this._el.draggable = 'true';
-
             //render template
-            this._el.innerHTML = View.TPL.replace('{title}', data.title);
-
-            //indent
-            this._indent();
-
-            //bind dom with view model
-            var token = this._tokenPool.add(this);
-            this._el.dataset.dtToken = token;
-            this._token = token;
+            this._el.innerHTML = View.TPL.replace('{title}', this._data.title);
         },
 
         _loadSuccess: function(newData){
@@ -416,25 +489,16 @@
         },
 
         _startLoad: function(){
-            var ic = View.getIcon(this._el);
-            ic.classList.remove(CLASS_NAME.NODE_ICON_FOLDER);
-            ic.classList.add(CLASS_NAME.NODE_ICON_LOADING);
+            View.startLoad(this._el);
         },
 
         _stopLoad: function(){
-            var ic = View.getIcon(this._el);
-            ic.classList.remove(CLASS_NAME.NODE_ICON_LOADING);
-            ic.classList.add(CLASS_NAME.NODE_ICON_FOLDER);
+            View.stopLoad(this._el);
         },
 
         _expand: function(){
             if (this._isFolder) {
-                var ic = View.getIcon(this._el);
-                var sw = View.getSwitch(this._el);
-                var bd = View.getBody(this._el);
-                sw.classList.add(CLASS_NAME.NODE_SWITCH_OPEN);
-                ic.classList.add(CLASS_NAME.NODE_ICON_OPEN);
-                bd.classList.add(CLASS_NAME.NODE_BODY_OPEN);
+                View.expand(this._el);
                 this._expanded = true;
             }
         },
@@ -488,12 +552,7 @@
 
         fold: function() {
             if (this._isFolder) {
-                var sw = View.getSwitch(this._el);
-                var ic = View.getIcon(this._el);
-                var bd = View.getBody(this._el);
-                sw.classList.remove(CLASS_NAME.NODE_SWITCH_OPEN);
-                ic.classList.remove(CLASS_NAME.NODE_ICON_OPEN);
-                bd.classList.remove(CLASS_NAME.NODE_BODY_OPEN);
+                View.fold(this._el);
                 this._expanded = false;
             }
         },
@@ -609,42 +668,25 @@
         /** Above are basic functions **/
 
         selBlur: function(){
-            var elTitle = View.getTitle(this._el);
-            elTitle.classList.add(CLASS_NAME.SELECTED_BLUR);
+            View.selblur(this._el);
         },
 
         select: function(){
             this._selected = true;
-
-            var elHead = View.getHead(this._el);
-            elHead.classList.remove(CLASS_NAME.SELECTED_BLUR);
-            elHead.classList.add(CLASS_NAME.SELECTED);
-            /*
-            var elTitle = View.getTitle(this._el);
-            elTitle.classList.remove(CLASS_NAME.SELECTED_BLUR);
-            elTitle.classList.add(CLASS_NAME.SELECTED);*/
+            View.select(this._el);
         },
 
         unselect: function(){
             this._selected = false;
-
-            var elHead = View.getHead(this._el);
-            elHead.classList.remove(CLASS_NAME.SELECTED);
-            elHead.classList.remove(CLASS_NAME.SELECTED_BLUR);
-            /*
-            var elTitle = View.getTitle(this._el);
-            elTitle.classList.remove(CLASS_NAME.SELECTED);
-            elTitle.classList.remove(CLASS_NAME.SELECTED_BLUR);*/
+            View.unselect(this._el);
         },
 
         cover: function(){
-            var elTitle = View.getTitle(this._el);
-            elTitle.classList.add(CLASS_NAME.COVERED);
+            View.cover(this._el);
         },
 
         uncover: function(){
-            var elTitle = View.getTitle(this._el);
-            elTitle.classList.remove(CLASS_NAME.COVERED);
+            View.uncover(this._el);
         },
 
         isSelected: function(){
@@ -791,13 +833,12 @@
             U.addHandler(this._elMenu, 'keydown', U.setScope(this, this._search));
             //outer click
             U.addHandler(window, 'click', U.setScope(this, this._selBlur));
-            /////////////
+            //drag
             U.addHandler(this._el, 'dragstart', U.setScope(this, this._dragStart));
             U.addHandler(this._el, 'dragenter', U.setScope(this, this._dragCover));
             U.addHandler(this._el, 'dragleave', U.setScope(this, this._dragCover));
             U.addHandler(this._el, 'dragover', U.setScope(this, this._dragOver));
             U.addHandler(this._el, 'drop', U.setScope(this, this._dragDrop));
-            /////////////
         },
 
 
@@ -832,7 +873,7 @@
             //for firfox, this event's target is a #text node
             target = target.nodeType === 3 ? target.parentNode : target;
 
-            if(target.classList.contains(CLASS_NAME.NODE_TITLE)){
+            if(View.isTitle(target)){
                 var currNodeEl = View.currentNode(target);
                 var currNode = this._tokenPool.get(currNodeEl.dataset.dtToken);
                 if(e.type === 'dragenter'){
@@ -850,7 +891,7 @@
 
         _dragDrop: function(e){
             var target = e.target;
-            if(target.classList.contains(CLASS_NAME.NODE_TITLE)){
+            if(View.isTitle(target)){
                 var currNodeEl = View.currentNode(target);
                 var currNode = this._tokenPool.get(currNodeEl.dataset.dtToken);
                 currNode.uncover();
@@ -865,7 +906,8 @@
 
         _selBlur: function(e){
             //select blur
-            if(!e.target.classList.contains(CLASS_NAME.SELECTED) && this._selectedNode){
+            var el = View.currentNode(e.target);
+            if(!el && this._selectedNode){
                 this._selectedNode.selBlur();
             }
         },
@@ -873,7 +915,7 @@
         _select: function(e){
             var target = e.target;
             var type = e.type;
-            if(type === 'click' && target.classList.contains(CLASS_NAME.NODE_TITLE)){
+            if(type === 'click' && View.isTitle(target)){
                 var currNodeEl = View.currentNode(target);
                 if (currNodeEl) {
                     //title is clicked
@@ -895,11 +937,11 @@
             var currNodeEl = null;
             var currNode = null;
 
-            if(type === 'click' && target.classList.contains(CLASS_NAME.NODE_SWITCH) ||
-                type === 'dblclick' && target.classList.contains(CLASS_NAME.NODE_TITLE)){
+            if(type === 'click' && View.isSwitch(target) ||
+                type === 'dblclick' && View.isTitle(target)){
                 currNodeEl = View.currentNode(target);
                 if (currNodeEl) {
-                    //icon is clicked title is dbl clicked
+                    //icon is clicked or title is dbl clicked
                     currNode = this._tokenPool.get(currNodeEl.dataset.dtToken);
                     currNode.toggleChildren();
                 }
@@ -912,7 +954,7 @@
 
             if(type === 'contextmenu'){
                 e.preventDefault();
-                if(target.classList.contains(CLASS_NAME.NODE_TITLE)){
+                if(View.isTitle(target)){
                     this._menuEventFlowing = true;
                     if (!this._menuShowing) {
                         this._showMenu(View.currentNode(target));
@@ -955,8 +997,7 @@
         _disableEdit: function(e) {
             if ((e.type === 'blur' ||
                     e.type === 'keydown' && e.keyCode == ENTER) &&
-                e.target.contentEditable === 'true') {
-                //event triggered by editable title
+                    e.target.contentEditable === 'true'){
                 var title = e.target;
                 var currNodeEl = View.currentNode(title);
                 var currNode = this._tokenPool.get(currNodeEl.dataset.dtToken);

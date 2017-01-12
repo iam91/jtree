@@ -1,20 +1,6 @@
 /**
  * Tree styles
  */
-.dt-node--sel {
-  background-color: #ffee82; }
-
-.dt-node--selblur {
-  background-color: #f2ead3; }
-
-.dt-node--covered {
-  background-color: #defbc2; }
-
-.dt-node__wrap {
-  color: #59606d;
-  font-size: 14px;
-  font-family: "Helvetica Neue", Helvetica, "microsoft yahei ui", "microsoft yahei", "simhei", Arial, sans-serif; }
-
 .dt-node__head {
   padding: 2px 0; }
 
@@ -29,9 +15,6 @@
 
 .dt-node__switch--hide {
   border-color: transparent; }
-
-.dt-node__switch--open {
-  transform: rotate(90deg); }
 
 .dt-node__title {
   line-height: 20px;
@@ -102,8 +85,20 @@
 .dt-node__icon--folder {
   background-image: url("./icons/folder-close.svg"); }
 
-.dt-node__icon--open {
+.dt-node--open > .dt-node__switch {
+  transform: rotate(90deg); }
+
+.dt-node--open > .dt-node__icon {
   background-image: url("./icons/folder-open.svg"); }
+
+.dt-node--sel > .dt-node__head {
+  background-color: #ffee82; }
+
+.dt-node--selblur > .dt-node__head {
+  background-color: #f2ead3; }
+
+.dt-node--covered > .dt-node__head {
+  background-color: #defbc2; }
 
 /**
  * Menu styles
