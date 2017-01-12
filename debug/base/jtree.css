@@ -17,8 +17,7 @@
 
 .dt-menu {
   position: absolute;
-  z-index: 99999;
-  left: 100%; }
+  z-index: 99999; }
   .dt-menu ul {
     padding: 0;
     margin: 0;

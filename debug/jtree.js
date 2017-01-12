@@ -257,6 +257,10 @@
             return el.classList.contains(this.CLASS_NAME.SELECTED);
         },
 
+        isSearch: function(el){
+            return el.classList.contains(this.CLASS_NAME.SEARCH);
+        },
+
         /**
          * Returns the root element of current node when el is icon, title or switcher
          * otherwise null is returned.
@@ -343,11 +347,21 @@
         },
 
         cover: function(el){
-            el.classList.add(this.CLASS_NAME.COVER);
+            el.classList.add(this.CLASS_NAME.COVERED);
         },
 
         uncover: function(el){
-            el.classList.remove(this.CLASS_NAME.UNCOVER);
+            el.classList.remove(this.CLASS_NAME.COVERED);
+        },
+
+        setFound: function(el){
+            var title = View.getTitle(el);
+            title.classList.add(this.CLASS_NAME.NODE_TITLE_FOUND);
+        },
+
+        clearFound: function(el){
+            var title = View.getTitle(el);
+            title.classList.remove(this.CLASS_NAME.NODE_TITLE_FOUND);
         },
 
         appendMenu: function(el, menu) {
@@ -356,7 +370,7 @@
         },
 
         menuParent: function(menu) {
-            return menu.parentNode.parentNode.parentNode;
+            return menu.parentNode.parentNode;
         }
 
     };
@@ -392,9 +406,6 @@
 
         this._el = null;
 
-        /**
-         * @type {TreeNode[]}
-         */
         this._children = [];
         /**
          * @type {TreeNode}
@@ -571,7 +582,7 @@
         search: function(keywords) {
             var r = false;
             var title = View.getTitle(this._el);
-            title.classList.remove(CLASS_NAME.NODE_TITLE_FOUND);
+            View.clearFound(this._el);
             for (var i = 0; i < this._children.length; i++) {
                 r = this._children[i].search(keywords) || r;
             }
@@ -580,7 +591,7 @@
                  * @todo add more flexible searching
                  */
                 r = true;
-                title.classList.add(CLASS_NAME.NODE_TITLE_FOUND);
+                View.setFound(this._el);
             }
             if (r) {
                 this.expand();
@@ -925,7 +936,7 @@
                     this._selectedNode = this._tokenPool.get(currNodeEl.dataset.dtToken);
                     this._selectedNode.select();
                     //if title is marked as found, remove found state when cliked
-                    target.classList.remove(CLASS_NAME.NODE_TITLE_FOUND);
+                    View.clearFound(currNodeEl);
                 }
             }
         },
@@ -965,7 +976,7 @@
             }else if(type === 'click'){
                 if(e.button === 0){
                     //in case that for ff, click will be triggered after contextmenu
-                    if(this._menuShowing && !target.classList.contains(CLASS_NAME.SEARCH)){
+                    if(this._menuShowing && !View.isSearch(target)){
                         this._hideMenu();
                     }
                 }
@@ -1009,7 +1020,7 @@
         _search: function(e) {
             if ((e.type === 'blur' ||
                     e.type === 'keydown' && e.keyCode == ENTER) &&
-                e.target.classList.contains(CLASS_NAME.SEARCH)) {
+                View.isSearch(e.target)) {
                 //event triggered by searching box
                 var keywords = e.target.value.trim();
                 var currNodeEl = View.menuParent(this._elMenu);
