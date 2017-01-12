@@ -926,7 +926,8 @@
         _select: function(e){
             var target = e.target;
             var type = e.type;
-            if(type === 'click' && View.isTitle(target)){
+            if(type === 'click' && View.isTitle(target) ||
+                type === 'click' && View.isHead(target)){
                 var currNodeEl = View.currentNode(target);
                 if (currNodeEl) {
                     //title is clicked
@@ -949,6 +950,7 @@
             var currNode = null;
 
             if(type === 'click' && View.isSwitch(target) ||
+                type === 'dblclick' && View.isHead(target) ||
                 type === 'dblclick' && View.isTitle(target)){
                 currNodeEl = View.currentNode(target);
                 if (currNodeEl) {

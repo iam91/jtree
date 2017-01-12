@@ -1,28 +1,29 @@
 /**
  * Tree styles
  */
+.dt-node {
+  font-family: "Helvetica Neue", Helvetica, "microsoft yahei ui", "microsoft yahei", "simhei", Arial, sans-serif; }
+
 .dt-node__head {
   padding: 2px 0; }
+  .dt-node__head:hover {
+    background-color: #EFF0F4; }
 
 .dt-node__switch {
   border-top: 5px solid transparent;
   border-bottom: 5px solid transparent;
-  border-left: 10px solid #499491;
+  border-left: 10px solid #58B3D3;
   display: inline-block;
-  margin: 5px 0;
+  margin: 5px 0 5px 0.5rem;
   vertical-align: text-bottom;
   transition: transform 0.06s linear; }
 
 .dt-node__switch--hide {
-  border-color: transparent; }
+  display: none; }
 
 .dt-node__title {
   line-height: 20px;
   padding: 0 2px; }
-  .dt-node__title:hover {
-    text-decoration: underline; }
-  .dt-node__title:active {
-    color: #282f44; }
 
 .dt-node__title--found {
   color: #fa4659;
@@ -39,6 +40,9 @@
   margin: 0 3px;
   display: inline-block;
   vertical-align: text-bottom; }
+
+.dt-node__icon--folder {
+  background-image: url("./icons/folder-close.svg"); }
 
 .dt-node__icon--js {
   background-image: url(./icons/js.svg); }
@@ -82,20 +86,28 @@
 .dt-node__icon--unknown {
   background-image: url(./icons/unknown.svg); }
 
-.dt-node__icon--folder {
-  background-image: url("./icons/folder-close.svg"); }
-
-.dt-node--open > .dt-node__switch {
+.dt-node--open > .dt-node__head > .dt-node__switch {
   transform: rotate(90deg); }
 
-.dt-node--open > .dt-node__icon {
+.dt-node--open > .dt-node__head > .dt-node__icon--folder {
   background-image: url("./icons/folder-open.svg"); }
 
 .dt-node--sel > .dt-node__head {
-  background-color: #ffee82; }
+  background-color: #0066CC; }
+  .dt-node--sel > .dt-node__head > .dt-node__switch {
+    border-left-color: white; }
+  .dt-node--sel > .dt-node__head > .dt-node__title {
+    color: white; }
+  .dt-node--sel > .dt-node__head > [class^="dt-node__icon"] {
+    background-image: url("./icons/file-sel.svg"); }
+  .dt-node--sel > .dt-node__head > .dt-node__icon--folder {
+    background-image: url("./icons/folder-close-sel.svg"); }
+
+[class="dt-node--sel dt-node--open"] > .dt-node__head > .dt-icon--folder {
+  background-image: url("./icons/folder-open-sel.svg"); }
 
 .dt-node--selblur > .dt-node__head {
-  background-color: #f2ead3; }
+  background-color: #EFF0F4; }
 
 .dt-node--covered > .dt-node__head {
   background-color: #defbc2; }
@@ -114,7 +126,8 @@
   .dt-menu ul ul {
     border: 1px solid rgba(0, 0, 0, 0.15);
     border-radius: 2px;
-    transition: box-shadow 0.1s linear; }
+    transition: box-shadow 0.1s linear;
+    background-color: white; }
     .dt-menu ul ul:hover {
       box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15); }
   .dt-menu > div {

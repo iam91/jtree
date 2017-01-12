@@ -23,10 +23,10 @@ $mime-icon:
 	'loading' 'unknown';
 
 $sw-size: 10px;
-$sw-color: #499491;
+$sw-color: #58B3D3;
 
-$sel-bg-color: #ffee82;
-$selblur-bg-color: #f2ead3;
+$sel-bg-color: #0066CC;
+$selblur-bg-color: #EFF0F4;
 
 $cover-color: #defbc2;
 
@@ -37,30 +37,31 @@ $cover-color: #defbc2;
 	display: inline-block;
 }
 
+.dt-node{
+	font-family: $font-stack;
+}
+
 .dt-node__head{
 	padding: 2px 0;
+	&:hover{
+		background-color: $selblur-bg-color;
+	}
 }
 
 .dt-node__switch{
 	@include switch($sw-size, $sw-size, $sw-color);
-	margin: ($icon-size - $sw-size) / 2 0;
+	margin: (($icon-size - $sw-size) / 2) 0 (($icon-size - $sw-size) / 2) 0.5rem;
 	vertical-align: text-bottom;
 	transition: transform 0.06s linear;
 }
 
 .dt-node__switch--hide{
-	border-color: transparent;
+	display: none;
 }
 
 .dt-node__title{
 	line-height: $icon-size;
 	padding: 0 2px;
-	&:hover{
-		text-decoration: underline;
-	}
-	&:active{
-		color: $font-active-color;
-	}
 }
 
 .dt-node__title--found{
@@ -82,26 +83,43 @@ $cover-color: #defbc2;
 	vertical-align: text-bottom;
 }
 
+.dt-node__icon--folder{
+	background-image: url('./icons/folder-close.svg');
+}
+
 @each $icon in $mime-icon{
 	.dt-node__icon--#{$icon}{
 		background-image: url(#{'./icons/' + $icon + '.svg'});
 	}
 }
 
-.dt-node__icon--folder{
-	background-image: url('./icons/folder-close.svg');
-}
-
-.dt-node--open > .dt-node__switch{
-	transform: rotate(90deg);
-}
-
-.dt-node--open > .dt-node__icon{
-	background-image: url('./icons/folder-open.svg');
+.dt-node--open > .dt-node__head{
+	& > .dt-node__switch{
+		transform: rotate(90deg);
+	}
+	& > .dt-node__icon--folder{
+		background-image: url('./icons/folder-open.svg');
+	}
 }
 
 .dt-node--sel > .dt-node__head{
 	background-color: $sel-bg-color;
+	& > .dt-node__switch{
+		border-left-color: white;
+	}
+	& > .dt-node__title{
+		color: white;
+	}
+	& > [class^="dt-node__icon"]{
+		background-image: url('./icons/file-sel.svg');
+	}
+	& > .dt-node__icon--folder{
+		background-image: url('./icons/folder-close-sel.svg');
+	}
+}
+
+[class="dt-node--sel dt-node--open"] > .dt-node__head > .dt-icon--folder{
+	background-image: url('./icons/folder-open-sel.svg');
 }
 
 .dt-node--selblur > .dt-node__head{
@@ -144,6 +162,7 @@ $search-line-height: 20px;
 
 	ul ul{
 		@include menu-border();
+		background-color: $menu-bg-color;
 	}
 
 	&>div{
