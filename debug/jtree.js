@@ -1,13 +1,5 @@
-;(function(window, document, undefined) {
+(function(window, document, undefined) {
     'use strict';
-
-    /**
-     * @todo 分离数据层操作
-     * @todo add mime
-     * @todo 修改样式
-     * @todo 总结html结构模板需要的方法
-     */
-
     /**
      * Ajax
      * @namespace
@@ -16,20 +8,16 @@
         /**
          * @todo add timeout and other data format except for json
          */
-        get: function(url, success, error){
-            if(url){
+        get: function(url, success, error) {
+            if (url) {
                 var xhr = new XMLHttpRequest();
-                xhr.onreadystatechange = function(){
-                    if(xhr.readyState === 4){
-                        if(xhr.status === 200){
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
                             var data = JSON.parse(xhr.responseText);
-                            if(success instanceof Function){
-                                success(data);
-                            }
-                        }else{
-                            if(error instanceof Function){
-                                error();
-                            }
+                            success(data);
+                        } else {
+                            error();
                         }
                     }
                 };
@@ -72,12 +60,6 @@
             };
         },
 
-        computedStyle: function(elem, attr) {
-            //currentStyle used in IE
-            return elem.currentStyle ? elem.currentStyle[attr] :
-                getComputedStyle(elem, null)[attr];
-        },
-
         select: function(elem) {
             var r = document.createRange();
             if (elem) {
@@ -95,80 +77,24 @@
             sel = null;
         },
 
-        deepCopy: deepCopy
-    };
-
-    function deepCopy(o) {
-        var r = null;
-        if (typeof o !== 'object') {
-            return o;
-        } else if (o instanceof Array) {
+        copy: function(o){
+          var r = null;
+          if(typeof o !== 'object'){
+            r = o;
+          }else if(o instanceof Array){
             r = [];
-            for (var i = 0; i < o.length; i++) {
-                r.push(deepCopy(o[i]));
+            for(var i = 0; i < o.length; i++){
+              r.push(this.copy(o[i]));
             }
-            return r;
-        } else if (o instanceof Object) {
+          }else if(o instanceof Object){
             r = {};
-            for (var k in o) {
-                r[k] = deepCopy(o[k]);
+            for(var k in o){
+              r[k] = this.copy(o[k]);
             }
-            return r;
-        }
-    }
-
-    /**
-     * Mime
-     * @namespace
-     */
-    var Mime = {
-        map: {
-            'text': {
-                'html': 'html',
-                'css': 'css',
-                'plain': 'txt'
-            },
-
-            'application': {
-                'js': 'js',
-                'pdf': 'pdf',
-                'vnd.ms-powerpoint': 'ppt',
-                'msword': 'word',
-                'vnd.ms-excel': 'xls',
-                'zip': 'zip'
-            },
-
-            'image': 'pic',
-            'video': 'video',
-            'audio': 'audio'
-        },
-
-        getFormat: function(mime) {
-            var m = mime.split('/');
-            var type = m[0];
-            var subtype = m[1];
-            var r = this.map[type];
-            if (r) {
-                return typeof r === 'string' ? r : r[subtype];
-            } else {
-                return null;
-            }
+          }
+          return r;
         }
     };
-
-    var mimeclass = {};
-    for (var type in Mime.map) {
-        var val = Mime.map[type];
-        if (typeof val === 'string') {
-            mimeclass[val] = 'dt-node__icon--' + val;
-        } else {
-            for (var subtype in val) {
-                var subval = val[subtype];
-                mimeclass[subval] = 'dt-node__icon--' + subval;
-            }
-        }
-    }
-    mimeclass.unknown = 'dt-node__icon--unknown';
 
     /**
      * View
@@ -180,104 +106,109 @@
 
         CLASS_NAME: {
             NODE: 'dt-node',
+            NODE_HEAD: 'dt-node__head',
+            NODE_BODY: 'dt-node__body',
+            NODE_ICON: {
+              FOLDER: 'dt-node__icon--folder',
+              FILE: 'dt-node__icon--file'
+            },
+            NODE_TITLE: 'dt-node__title',
+            NODE_SWITCH: {
+              FOLDER: 'dt-node__switch--folder',
+              FILE: 'dt-node__switch--file'
+            },
+            MENU: 'dt-menu',
+            SEARCH: 'dt-search',
+
             NODE_OPEN: 'dt-node--open',
             SELECTED: 'dt-node--sel',
             SELECTED_BLUR: 'dt-node--selblur',
             COVERED: 'dt-node--covered',
 
-            NODE_HEAD: 'dt-node__head',
-
-            NODE_BODY: 'dt-node__body',
-
-            NODE_SWITCH: 'dt-node__switch',
-            NODE_SWITCH_HIDE: 'dt-node__switch--hide',
-
-            NODE_ICON: 'dt-node__icon',
             NODE_ICON_LOADING: 'dt-node__icon--loading',
-            NODE_ICON_FOLDER: 'dt-node__icon--folder',
-            NODE_ICON_MIME: mimeclass,
-
-            NODE_TITLE: 'dt-node__title',
-            NODE_TITLE_FOUND: 'dt-node__title--found',
-
-            MENU: 'dt-menu',
-            SEARCH: 'dt-search'
+            NODE_TITLE_FOUND: 'dt-node__title--found'
         },
 
         MENU: {
-            TPL: '<div><ul>' +
-                    '<li><a name="create">create</a></li>' +
-                    '<li><a name="delete">delete</a></li>' +
-                    '<li><a name="rename">rename</a></li>' +
-                    '<li>' +
-                        '<a name="search">search</a>' +
-                        '<ul>' +
-                            '<li>' +
-                                '<input class="dt-search" type="text" placeholder="Input keywords">' +
-                            '</li>' +
-                        '</ul>' +
-                    '</li>' +
-                    '<li>' +
-                        '<a>Edit</a>' +
-                        '<ul>' +
-                            '<li><a name="cut">cut</a></li>' +
-                            '<li><a name="copy">copy</a></li>' +
-                            '<li><a name="paste">paste</a></li>' +
-                        '</ul>' +
-                    '</li>' +
+            TPL: [
+              '<div><ul>',
+                  '<li><a name="create">create</a></li>',
+                  '<li><a name="delete">delete</a></li>',
+                  '<li><a name="rename">rename</a></li>',
+                  '<li>',
+                    '<a name="search">search</a>',
+                    '<ul>',
+                      '<li>',
+                        '<input class="dt-search" type="text" placeholder="Input keywords">',
+                      '</li>',
+                    '</ul>',
+                  '</li>',
+                  '<li>',
+                    '<a>Edit</a>',
+                    '<ul>',
+                      '<li><a name="cut">cut</a></li>',
+                      '<li><a name="copy">copy</a></li>',
+                      '<li><a name="paste">paste</a></li>',
+                    '</ul>',
+                  '</li>',
                 '</ul></div>',
+            ].join('')
         },
 
-        TPL:'<div class="dt-node__head">' +
-                '<span class="dt-node__switch"></span>' +
-                '<span class="dt-node__icon"></span>' +
-                '<span class="dt-node__title">' +
-                    '{title}' +
-                '</span>' +
-            '</div>' +
-            '<div class="dt-node__body"></div>',
+        TPL: [
+          '<div class="dt-node__head">',
+            '<span class="dt-node__switch"></span>',
+            '<span class="dt-node__icon"></span>',
+            '<span class="dt-node__title">',
+              '{title}',
+            '</span>',
+          '</div>',
+          '<div class="dt-node__body"></div>',
+        ].join(''),
 
-        isIcon: function(el){
-            return el.classList.contains(this.CLASS_NAME.NODE_ICON);
+        isIcon: function(el) {
+            return el.classList.contains(this.CLASS_NAME.NODE_ICON.FOLDER) ||
+              el.classList.contains(this.CLASS_NAME.NODE_ICON.FILE);
         },
 
-        isTitle: function(el){
+        isSwitch: function(el) {
+            return el.classList.contains(this.CLASS_NAME.NODE_SWITCH.FOLDER) ||
+             el.classList.contains(this.CLASS_NAME.NODE_SWITCH.FILE);
+        },
+
+        isTitle: function(el) {
             return el.classList.contains(this.CLASS_NAME.NODE_TITLE);
         },
 
-        isHead: function(el){
+        isHead: function(el) {
             return el.classList.contains(this.CLASS_NAME.NODE_HEAD);
         },
 
-        isSwitch: function(el){
-            return el.classList.contains(this.CLASS_NAME.NODE_SWITCH);
-        },
-
-        isSelected: function(el){
+        isSelected: function(el) {
             return el.classList.contains(this.CLASS_NAME.SELECTED);
         },
 
-        isSearch: function(el){
+        isSearch: function(el) {
             return el.classList.contains(this.CLASS_NAME.SEARCH);
         },
 
         /**
-         * Returns the root element of current node when el is icon, title or switcher
+         * Returns the root element of current node when el is icon, title or switcher,
          * otherwise null is returned.
          * @param {HTMLElement} el
          * @return {HTMLElement|null}
          */
         currentNode: function(el) {
-            if(this.isIcon(el) || this.isTitle(el) || this.isSwitch(el)){
+            if (this.isIcon(el) || this.isTitle(el) || this.isSwitch(el)) {
                 return el.parentNode.parentNode;
-            } else if(this.isHead(el)){
+            } else if (this.isHead(el)) {
                 return el.parentNode;
             } else {
                 return null;
             }
         },
 
-        getSwitch: function(el){
+        getSwitch: function(el) {
             return el.firstChild.firstChild;
         },
 
@@ -297,69 +228,81 @@
             return el.firstChild.firstChild.nextElementSibling.nextElementSibling;
         },
 
-        setIcon: function(el, type, mime){
+        setIcon: function(el, type) {
             var ic = this.getIcon(el);
-            if(type === NODE_TYPE.FILE){
-                ic.classList.add(this.CLASS_NAME.NODE_ICON_MIME[mime]);
-            }else if(type === NODE_TYPE.FOLDER){
-                ic.classList.add(this.CLASS_NAME.NODE_ICON_FOLDER);
-            }
+            ic.classList.add(type === NODE_TYPE.FILE ?
+              this.CLASS_NAME.NODE_ICON.FILE : this.CLASS_NAME.NODE_ICON.FOLDER);
         },
 
-        switchHide: function(el){
+        setSwitch: function(el, type) {
             var sw = this.getSwitch(el);
-            sw.classList.add(this.CLASS_NAME.NODE_SWITCH_HIDE);
+            sw.classList.add(type === NODE_TYPE.FILE ?
+              this.CLASS_NAME.NODE_SWITCH.FILE : this.CLASS_NAME.NODE_SWITCH.FOLDER);
         },
 
-        expand: function(el){
+        indent: function(el, depth){
+          var head = View.getHead(el);
+          head.style.paddingLeft = View.INDENT * depth + 'rem';
+        },
+
+        append: function(par, chd){
+          var bd = this.getBody(par);
+          bd.appendChild(chd);
+        },
+
+        detach: function(chd){
+          chd.remove();
+        },
+
+        expand: function(el) {
             el.classList.add(this.CLASS_NAME.NODE_OPEN);
         },
 
-        fold: function(el){
+        fold: function(el) {
             el.classList.remove(this.CLASS_NAME.NODE_OPEN);
         },
 
-        startLoad: function(el){
+        startLoad: function(el) {
             var ic = View.getIcon(el);
             ic.classList.remove(this.CLASS_NAME.NODE_ICON_FOLDER);
             ic.classList.add(this.CLASS_NAME.NODE_ICON_LOADING);
         },
 
-        stopLoad: function(el){
+        stopLoad: function(el) {
             var ic = View.getIcon(el);
             ic.classList.remove(this.CLASS_NAME.NODE_ICON_LOADING);
             ic.classList.add(this.CLASS_NAME.NODE_ICON_FOLDER);
         },
 
-        select: function(el){
+        select: function(el) {
             el.classList.add(this.CLASS_NAME.SELECTED);
             el.classList.remove(this.CLASS_NAME.SELECTED_BLUR);
         },
 
-        selblur: function(el){
+        selblur: function(el) {
             el.classList.add(this.CLASS_NAME.SELECTED_BLUR);
             el.classList.remove(this.CLASS_NAME.SELECTED);
         },
 
-        unselect: function(el){
+        unselect: function(el) {
             el.classList.remove(this.CLASS_NAME.SELECTED);
             el.classList.remove(this.CLASS_NAME.SELECTED_BLUR);
         },
 
-        cover: function(el){
+        cover: function(el) {
             el.classList.add(this.CLASS_NAME.COVERED);
         },
 
-        uncover: function(el){
+        uncover: function(el) {
             el.classList.remove(this.CLASS_NAME.COVERED);
         },
 
-        setFound: function(el){
+        setFound: function(el) {
             var title = View.getTitle(el);
             title.classList.add(this.CLASS_NAME.NODE_TITLE_FOUND);
         },
 
-        clearFound: function(el){
+        clearFound: function(el) {
             var title = View.getTitle(el);
             title.classList.remove(this.CLASS_NAME.NODE_TITLE_FOUND);
         },
@@ -389,6 +332,28 @@
 
     var ENTER = 13;
 
+    /* ================== Following is Tokens definition ==================*/
+    function Tokens() {
+        this._tokens = [];
+    }
+
+    Tokens.prototype = {
+
+        constructor: Tokens,
+
+        get: function(token) {
+            return this._tokens[token];
+        },
+
+        add: function(node) {
+            var token = this._tokens.length;
+            this._tokens.push(node);
+            return token;
+        }
+
+    };
+    /* ================== Above is Tokens definition ==================*/
+
     /* ================== Following is TreeNode definition ==================*/
     /**
      * TreeNode class
@@ -402,6 +367,7 @@
         this._data = data;
         this._token = null;
         this._tokenPool = tokenPool;
+        //for indent computation
         this._depth = parent && (parent.getDepth() + 1) || 0;
 
         this._el = null;
@@ -416,7 +382,6 @@
         this._selected = false;
         this._expanded = false;
         this._isEditing = false;
-
         this._isFolder = false;
 
         this._init(tokenPool);
@@ -426,51 +391,22 @@
 
         constructor: TreeNode,
 
-        _init: function(){
+        _init: function() {
             this._render();
             //bind dom with view model
             this._setToken();
             //add icons
-            this._addIcon();
-
+            this._setIcon();
             //set children nodes
             var data = this._data;
             if (typeof data.children === 'string') {
                 this._lazy = true;
             } else if (data.children instanceof Array) {
-                //render children
                 for (var i = 0; i < data.children.length; i++) {
                     var child = new TreeNode(this._tokenPool, data.children[i], this);
                     this.appendChild(child);
                 }
             }
-        },
-
-        _addIcon: function(){
-            var data = this._data;
-            //add icons
-            if (data.type === NODE_TYPE.FILE) {
-                //file icon
-                var format = data.mime && Mime.getFormat(data.mime) || 'unknown';
-                View.switchHide(this._el);
-                View.setIcon(this._el, data.type, format);
-                this._isFolder = false;
-            } else if (data.type === NODE_TYPE.FOLDER) {
-                //folder icon
-                View.setIcon(this._el, data.type);
-                this._isFolder = true;
-            }
-        },
-
-        _indent: function(){
-            var head = View.getHead(this._el);
-            head.style.paddingLeft = View.INDENT * this._depth + 'rem';
-        },
-
-        _setToken: function(){
-            var token = this._tokenPool.add(this);
-            this._el.dataset.dtToken = token;
-            this._token = token;
         },
 
         _render: function() {
@@ -482,32 +418,37 @@
             this._el.innerHTML = View.TPL.replace('{title}', this._data.title);
         },
 
-        _loadSuccess: function(newData){
-            if(newData){
+        _setToken: function() {
+            var token = this._tokenPool.add(this);
+            this._el.dataset.dtToken = token;
+            this._token = token;
+        },
+
+        _setIcon: function() {
+            var data = this._data;
+            View.setIcon(this._el, data.type);
+            View.setSwitch(this._el, data.type);
+            this._isFolder = data.type === NODE_TYPE.FOLDER;
+        },
+
+        _loadSuccess: function(newData) {
+            if (newData) {
                 var child = new TreeNode(this._tokenPool, newData, this);
                 this.appendChild(child);
                 //handle data model
                 this._data.children = [newData];
                 this._lazy = false;
             }
-            this._stopLoad();
+            View.stopLoad(this._el);
             this._expand();
         },
 
-        _loadError: function(){
+        _loadError: function() {
             alert(this._data.title + ' data load error!');
-            this._stopLoad();
-        },
-
-        _startLoad: function(){
-            View.startLoad(this._el);
-        },
-
-        _stopLoad: function(){
             View.stopLoad(this._el);
         },
 
-        _expand: function(){
+        _expand: function() {
             if (this._isFolder) {
                 View.expand(this._el);
                 this._expanded = true;
@@ -519,8 +460,7 @@
          * @param {TreeNode} child
          */
         appendChild: function(child) {
-            var elBody = View.getBody(this._el);
-            elBody.appendChild(child.getElem());
+            View.append(this._el, child.getElem());
             this._children.push(child);
             child.setDepth(this.getDepth() + 1);
         },
@@ -531,8 +471,8 @@
          * @return {Number} child index before removal
          */
         removeChild: function(child) {
+            View.detach(child.getElem());
             var id = this._children.indexOf(child);
-            child.getElem().remove();
             this._children.splice(id, 1);
             return id;
         },
@@ -549,14 +489,15 @@
         },
 
         expand: function() {
-            if (this._lazy && typeof this._data.children === 'string'){
+            if (this._lazy && typeof this._data.children === 'string') {
                 var url = this._data.children;
                 Ajax.get(url,
                     U.setScope(this, this._loadSuccess),
                     U.setScope(this, this._loadError)
                 );
-                this._startLoad();
+                View.startLoad(this._el);
             } else {
+                View.stopLoad(this._el);
                 this._expand();
             }
         },
@@ -627,6 +568,7 @@
 
         rename: function() {
             var title = View.getTitle(this._el);
+            //!this method is coupled with dom
             if (this._isEditing) {
                 var newTitle = title.innerHTML.trim();
                 this._isEditing = false;
@@ -657,7 +599,7 @@
          * @return {TreeNode}
          */
         copy: function() {
-            var copyData = U.deepCopy(this._data);
+            var copyData = U.copy(this._data);
             return new TreeNode(this._tokenPool, copyData);
         },
 
@@ -678,37 +620,37 @@
 
         /** Above are basic functions **/
 
-        selBlur: function(){
+        selBlur: function() {
             View.selblur(this._el);
         },
 
-        select: function(){
+        select: function() {
             this._selected = true;
             View.select(this._el);
         },
 
-        unselect: function(){
+        unselect: function() {
             this._selected = false;
             View.unselect(this._el);
         },
 
-        cover: function(){
+        cover: function() {
             View.cover(this._el);
         },
 
-        uncover: function(){
+        uncover: function() {
             View.uncover(this._el);
         },
 
-        isSelected: function(){
+        isSelected: function() {
             return this._selected;
         },
 
-        isFolder: function(){
+        isFolder: function() {
             return this._isFolder;
         },
 
-        isLazy: function(){
+        isLazy: function() {
             return this._lazy;
         },
 
@@ -732,7 +674,7 @@
          * @public
          * @return {Number}
          */
-        getDepth: function(){
+        getDepth: function() {
             return this._depth;
         },
 
@@ -740,40 +682,16 @@
          * @public
          * @param {Number} dep
          */
-        setDepth: function(dep){
-            this._depth = dep;
-            this._indent();
+        setDepth: function(dep) {
+            View.indent(this._el, dep);
             //reset children's depths
-            if(this._children.length){
-                for(var i = 0; i < this._children.length; i++){
-                    this._children[i].setDepth(dep + 1);
-                }
+            for (var i = 0; i < this._children.length; i++) {
+                this._children[i].setDepth(dep + 1);
             }
+            this._depth = dep;
         }
     };
     /* ================== Above is TreeNode definition ==================*/
-
-    /* ================== Following is Tokens definition ==================*/
-    function Tokens() {
-        this._tokens = [];
-    }
-
-    Tokens.prototype = {
-
-        constructor: Tokens,
-
-        get: function(token) {
-            return this._tokens[token];
-        },
-
-        add: function(node) {
-            var token = this._tokens.length;
-            this._tokens.push(node);
-            return token;
-        }
-
-    };
-    /* ================== Above is Tokens definition ==================*/
 
     /* ================== Following is Tree definition ==================*/
     /**
@@ -782,7 +700,7 @@
      */
 
     function Tree(data, el) {
-        this._data = U.deepCopy(data) || null;
+        this._data = U.copy(data) || null;
         this._tokenPool = new Tokens();
 
         this._el = el || null;
@@ -868,46 +786,45 @@
 
         /** Following are event handlers **/
 
-        _dragStart: function(e){
+        _dragStart: function(e) {
             var target = e.target;
             var currNode = this._tokenPool.get(target.dataset.dtToken);
             currNode.fold();
             this._draggedNode = currNode;
-            //for firfox, drag image should be triggered by setData?
+            //for firefox, drag image should be triggered by setData?
             e.dataTransfer.setData('text/html', '');
             e.dataTransfer.setDragImage(target, 0, 0);
         },
 
-        _dragCover: function(e){
+        _dragCover: function(e) {
             var target = e.target;
-
-            //for firfox, this event's target is a #text node
+            //for firefox, this event's target is a #text node
             target = target.nodeType === 3 ? target.parentNode : target;
 
-            if(View.isTitle(target)){
+            if (View.isTitle(target)) {
                 var currNodeEl = View.currentNode(target);
                 var currNode = this._tokenPool.get(currNodeEl.dataset.dtToken);
-                if(e.type === 'dragenter'){
+                if (e.type === 'dragenter') {
                     currNode.cover();
                     currNode.expand();
-                }else if(e.type === 'dragleave'){
+                } else if (e.type === 'dragleave') {
                     currNode.uncover();
                 }
             }
         },
 
-        _dragOver: function(e){
+        _dragOver: function(e) {
             e.preventDefault();
         },
 
-        _dragDrop: function(e){
+        _dragDrop: function(e) {
             var target = e.target;
-            if(View.isTitle(target)){
+            if (View.isTitle(target)) {
                 var currNodeEl = View.currentNode(target);
                 var currNode = this._tokenPool.get(currNodeEl.dataset.dtToken);
                 currNode.uncover();
 
-                if(currNode.isFolder()){
+                if (currNode.isFolder()) {
                     var draggedNode = this._draggedNode;
                     draggedNode.cut();
                     currNode.paste(draggedNode);
@@ -915,23 +832,23 @@
             }
         },
 
-        _selBlur: function(e){
+        _selBlur: function(e) {
             //select blur
             var el = View.currentNode(e.target);
-            if(!el && this._selectedNode){
+            if (!el && this._selectedNode) {
                 this._selectedNode.selBlur();
             }
         },
 
-        _select: function(e){
+        _select: function(e) {
             var target = e.target;
             var type = e.type;
-            if(type === 'click' && View.isTitle(target) ||
-                type === 'click' && View.isHead(target)){
+            if (type === 'click' && View.isTitle(target) ||
+                type === 'click' && View.isHead(target)) {
                 var currNodeEl = View.currentNode(target);
                 if (currNodeEl) {
                     //title is clicked
-                    if(this._selectedNode){
+                    if (this._selectedNode) {
                         this._selectedNode.unselect();
                     }
                     this._selectedNode = this._tokenPool.get(currNodeEl.dataset.dtToken);
@@ -949,9 +866,9 @@
             var currNodeEl = null;
             var currNode = null;
 
-            if(type === 'click' && View.isSwitch(target) ||
+            if (type === 'click' && View.isSwitch(target) ||
                 type === 'dblclick' && View.isHead(target) ||
-                type === 'dblclick' && View.isTitle(target)){
+                type === 'dblclick' && View.isTitle(target)) {
                 currNodeEl = View.currentNode(target);
                 if (currNodeEl) {
                     //icon is clicked or title is dbl clicked
@@ -965,9 +882,9 @@
             var target = e.target;
             var type = e.type.toLowerCase();
 
-            if(type === 'contextmenu'){
+            if (type === 'contextmenu') {
                 e.preventDefault();
-                if(View.isTitle(target)){
+                if (View.isHead(target)) {
                     this._menuEventFlowing = true;
                     if (!this._menuShowing) {
                         this._showMenu(View.currentNode(target));
@@ -975,10 +892,10 @@
                         this._hideMenu();
                     }
                 }
-            }else if(type === 'click'){
-                if(e.button === 0){
+            } else if (type === 'click') {
+                if (e.button === 0) {
                     //in case that for ff, click will be triggered after contextmenu
-                    if(this._menuShowing && !View.isSearch(target)){
+                    if (this._menuShowing && !View.isSearch(target)) {
                         this._hideMenu();
                     }
                 }
@@ -1010,7 +927,7 @@
         _disableEdit: function(e) {
             if ((e.type === 'blur' ||
                     e.type === 'keydown' && e.keyCode == ENTER) &&
-                    e.target.contentEditable === 'true'){
+                e.target.contentEditable === 'true') {
                 var title = e.target;
                 var currNodeEl = View.currentNode(title);
                 var currNode = this._tokenPool.get(currNodeEl.dataset.dtToken);
@@ -1027,7 +944,7 @@
                 var keywords = e.target.value.trim();
                 var currNodeEl = View.menuParent(this._elMenu);
                 var currNode = this._tokenPool.get(currNodeEl.dataset.dtToken);
-                if(keywords){
+                if (keywords) {
                     //if keywords exists
                     var r = currNode.search(keywords);
                     this._hideMenu();
@@ -1047,7 +964,7 @@
         /**
          * @return {Object}
          */
-        getData: function(){
+        getData: function() {
             return this._data;
         }
 

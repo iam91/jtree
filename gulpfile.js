@@ -1,9 +1,8 @@
 var gulp = require('gulp');
 
 var jshint = require('gulp-jshint');
-var sass = require('gulp-sass');
+var sass = require('gulp-ruby-sass');
 var cleancss = require('gulp-clean-css');
-var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var rename = require('gulp-rename');
 var svgmin = require('gulp-svgmin');
@@ -13,7 +12,7 @@ var mode = 'debug';
 var paths = {
 	src: {
 		js: './src/**/*.js',
-		sass: './src/**/*.scss',
+		scss: './src/**/*.scss',
 		svg: './src/**/*.svg'
 	},
 
@@ -33,9 +32,11 @@ gulp.task('lint', function(){
 });
 
 gulp.task('basesass', function(){
-	gulp.src(paths.src.sass)
-	    .pipe(sass())
-		.pipe(gulp.dest(paths.debug.dest))
+	return sass(paths.src.scss, {
+			    stopOnError: true,
+			    compass: true,
+			})
+			.pipe(gulp.dest(paths.debug.dest))
 	    .pipe(cleancss())
 	    .pipe(gulp.dest(paths.release.dest));
 });

@@ -1,8 +1,32 @@
 {
-  "devDependencies": {
-    "gulp-clean-css": "^2.3.2",
-    "gulp-sass": "^2.3.2",
-    "node-sass": "^3.11.2",
-    "gulp-svgmin": "^1.2.3"
-  }
+  "name": "jtree",
+  "version": "1.0.0",
+  "description": "",
+  "main": "gulpfile.js",
+  "dependencies": {
+    "gulp-html-prettify": "^0.0.1",
+    "gulp-connect": "^5.0.0",
+    "gulp": "^3.9.1",
+    "gulp-rename": "^1.2.2",
+    "gulp-ruby-sass": "^2.1.0",
+    "gulp-clean-css": "^2.4.0",
+    "gulp-svgmin": "^1.2.3",
+    "gulp-uglify": "^2.0.1",
+    "gulp-jshint": "^2.0.4",
+    "jshint": "^2.9.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iam91/jtree.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/iam91/jtree/issues"
+  },
+  "homepage": "https://github.com/iam91/jtree#readme"
 }
